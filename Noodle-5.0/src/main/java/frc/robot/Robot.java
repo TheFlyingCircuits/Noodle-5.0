@@ -4,12 +4,17 @@
 
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -23,6 +28,15 @@ public class Robot extends LoggedRobot  {
     m_robotContainer = new RobotContainer();
 
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    if(RobotBase.isSimulation()) {
+      // Obtains the default instance of the simulation world, which is a Crescendo Arena.
+      SimulatedArena.getInstance();
+      // Add a fuel
+      SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(new Translation2d(3, 3)));
+      // Overrides the default simulation
+      // SimulatedArena.overrideInstance(); 
+    }
   }
 
   private void initAdvantageKit() {
@@ -44,7 +58,20 @@ public class Robot extends LoggedRobot  {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    if(RobotBase.isSimulation()) {
+      simulationPeriod();
+    }
   }
+
+public void simulationPeriod() {
+  // Get the positions of the fuel (both on the field and in the air)
+  Pose3d[] fuelPoses = SimulatedArena.getInstance()
+        .getGamePiecesArrayByType("Fuel");
+  // Publish to telemetry using AdvantageKit
+  Logger.recordOutput("FieldSimulation/FuelPositions", fuelPoses);
+  SimulatedArena.getInstance().simulationPeriodic();
+}
 
   @Override
   public void disabledInit() {}
