@@ -65,9 +65,9 @@ public class SwerveModuleIOMapleSim implements SwerveModuleIO {
 
     @Override
     public void setTurnAngle(double angleDegrees) {
-        double errorRotations = angleDegrees - this.moduleSimulation.getSteerAbsoluteAngle().in(Degrees);
+        double errorRotations = Units.degreesToRotations(angleDegrees - this.moduleSimulation.getSteerAbsoluteAngle().in(Degrees));
         double outputVoltage = steerPID.calculate(errorRotations) + feedForwardSteer.calculate(angleDegrees);
-        setAngleVoltage(outputVoltage);
+        setAngleVoltage(outputVoltage*-1.0);
     }
 
     @Override
@@ -79,6 +79,7 @@ public class SwerveModuleIOMapleSim implements SwerveModuleIO {
     public void setAngleVoltage(double voltage) {
         this.steerMotor.requestVoltage(Volts.of(voltage));
     }
+
     
     @Override
     public void updateInputs(SwerveModuleIOInputs inputs) {

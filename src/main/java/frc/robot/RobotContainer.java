@@ -21,6 +21,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -71,7 +72,7 @@ public class RobotContainer {
                 1.0/Constants.SwerveModuleConstants.steerGearReduction, // Steer motor gear ratio.
                 Volts.of(0.25), // Drive friction voltage.
                 Volts.of(0.2), // Steer friction voltage
-                Inches.of(Constants.SwerveModuleConstants.wheelRadiusMeters), // Wheel radius
+                Inches.of(Units.metersToInches(Constants.SwerveModuleConstants.wheelRadiusMeters)), // Wheel radius
                 KilogramSquareMeters.of(0.03), // Steer MOI
                 1.2)) // Wheel COF
         // Configures the track length and track width (spacing between swerve modules)
