@@ -26,8 +26,6 @@ public class GyroIOMapleSim implements GyroIO {
         inputs.robotYawRotation2d = gyroSim.getGyroReading();
     };
 
-    
-
     /** Adds angle to yawDegrees..
      * @param angleDegrees - the angle to add to yawDegrees.
      */

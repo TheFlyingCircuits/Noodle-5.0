@@ -4,13 +4,19 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,10 +30,8 @@ import frc.robot.subsystems.HumanDriver;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOMapleSim;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon;
-import frc.robot.subsystems.drivetrain.GyroIOSim;
 import frc.robot.subsystems.drivetrain.SwerveModuleIOKraken;
 import frc.robot.subsystems.drivetrain.SwerveModuleIOMapleSim;
-import frc.robot.subsystems.drivetrain.SwerveModuleIOSim;
 
 public class RobotContainer {
 
@@ -60,11 +64,16 @@ public class RobotContainer {
         // Specify gyro type (for realistic gyro drifting and error simulation)
         .withGyro(COTS.ofPigeon2())
         // Specify swerve module (for realistic swerve dynamics)
-        .withSwerveModule(COTS.ofMark4i(
+        .withSwerveModule(new SwerveModuleSimulationConfig(
                 DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
-                DCMotor.getKrakenX60(1), // Steer motor is a Falcon 500
-                COTS.WHEELS.SLS_PRINTED_WHEELS.cof, // Use the COF for Colson Wheels
-                3)) // L3 Gear ratio
+                DCMotor.getKrakenX44(1), // Steer motor is a Falcon 500
+                1.0/Constants.SwerveModuleConstants.driveGearReduction, // Drive motor gear ratio.
+                1.0/Constants.SwerveModuleConstants.steerGearReduction, // Steer motor gear ratio.
+                Volts.of(0.25), // Drive friction voltage.
+                Volts.of(0.2), // Steer friction voltage
+                Inches.of(Constants.SwerveModuleConstants.wheelRadiusMeters), // Wheel radius
+                KilogramSquareMeters.of(0.03), // Steer MOI
+                1.2)) // Wheel COF
         // Configures the track length and track width (spacing between swerve modules)
         .withTrackLengthTrackWidth(
             Meters.of(DrivetrainConstants.wheelbaseMeters), 
@@ -117,7 +126,14 @@ public class RobotContainer {
         }).withName("driverFullyControlDrivetrain");
     }
 
+  /** Called by Robot.java, convenience function for logging. */
+  public void periodic() {
+    Logger.recordOutput("robotContainer/simulatedDrivetrainPoseMeters", swerveDriveSimulation.getSimulatedDriveTrainPose());
+  }
+
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
+
+
 }
