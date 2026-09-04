@@ -67,7 +67,7 @@ public class RobotContainer {
         // Specify swerve module (for realistic swerve dynamics)
         .withSwerveModule(new SwerveModuleSimulationConfig(
                 DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
-                DCMotor.getKrakenX44(1), // Steer motor is a Falcon 500
+                DCMotor.getNEO(1), // Steer motor is a Falcon 500
                 1.0/Constants.SwerveModuleConstants.driveGearReduction, // Drive motor gear ratio.
                 1.0/Constants.SwerveModuleConstants.steerGearReduction, // Steer motor gear ratio.
                 Volts.of(0.25), // Drive friction voltage.
