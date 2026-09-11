@@ -29,10 +29,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.HumanDriver;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.GyroIOMapleSim;
-import frc.robot.subsystems.drivetrain.GyroIOPigeon;
-import frc.robot.subsystems.drivetrain.SwerveModuleIOKraken;
-import frc.robot.subsystems.drivetrain.SwerveModuleIOMapleSim;
+import frc.robot.subsystems.drivetrain.gyro.GyroIOMapleSim;
+import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
+import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIOKraken;
+import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIOMapleSim;
 
 public class RobotContainer {
 
@@ -102,7 +102,7 @@ public class RobotContainer {
             new SwerveModuleIOMapleSim(swerveDriveSimulation.getModules()[3])
         );
 
-        drivetrain.setPoseMeters(new Pose2d(3, 3, new Rotation2d()));
+        drivetrain.odometry.setPoseMeters(new Pose2d(3, 3, new Rotation2d()));
 
         SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
     }

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drivetrain;
+package frc.robot.subsystems.drivetrain.swerve;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
