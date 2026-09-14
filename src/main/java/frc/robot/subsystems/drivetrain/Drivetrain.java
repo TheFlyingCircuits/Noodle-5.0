@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldConstants;
+import frc.robot.subsystems.drivetrain.drivetrain_util.Odometry;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
 import frc.robot.subsystems.drivetrain.swerve.SwerveModule;
 import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIO;
@@ -51,13 +52,6 @@ public class Drivetrain extends SubsystemBase {
         };
 
         this.odometry = new Odometry(this, gyroIO);
-
-        angleController = new PIDController(5, 0, 0.0); 
-        angleController.enableContinuousInput(-180, 180);
-        angleController.setTolerance(1); // degrees, degreesPerSecond.
-
-        translationController = new PIDController(2.0, 0, 0.0); // kP has units of metersPerSecond per meter of error.
-        translationController.setTolerance(0.02, 1.0); // meters, metersPerSecond
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -76,7 +70,6 @@ public class Drivetrain extends SubsystemBase {
 
         return swervePositions;
     }
-
 
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] swerveStates = new SwerveModuleState[4];
@@ -138,67 +131,8 @@ public class Drivetrain extends SubsystemBase {
         return s;
     }
 
-
-    public void fieldOrientedDriveWhileAiming(ChassisSpeeds desiredTranslationalSpeeds, Rotation2d desiredAngle) {
-        // Use PID controller to generate a desired angular velocity based on the desired angle
-        double measuredAngle = odometry.getPoseMeters().getRotation().getDegrees();
-        double desiredAngleDegrees = desiredAngle.getDegrees();
-        double desiredDegreesPerSecond = angleController.calculate(measuredAngle, desiredAngleDegrees);
-        if (angleController.atSetpoint()) {
-            desiredDegreesPerSecond = 0;
-        }
-
-        ChassisSpeeds desiredSpeeds = new ChassisSpeeds(
-            desiredTranslationalSpeeds.vxMetersPerSecond,
-            desiredTranslationalSpeeds.vyMetersPerSecond,
-            Units.degreesToRadians(desiredDegreesPerSecond)
-        );
-
-        this.fieldOrientedDrive(desiredSpeeds);
-    }
-
-    public void pidToPose(Pose2d desired, double maxSpeedMetersPerSecond) {
-        Logger.recordOutput("drivetrain/pidSetpointMeters", desired);
-        // translationController.setP(pValue);
-
-        Pose2d current = odometry.getPoseMeters();
-
-        Translation2d error = desired.getTranslation().minus(current.getTranslation());
-
-        Logger.recordOutput("drivetrain/pidErrorMeters", error);
-        
-        double pidOutputMetersPerSecond = -translationController.calculate(error.getNorm(), 0);
-
-
-        if (translationController.atSetpoint()) {
-            pidOutputMetersPerSecond = 0;
-        }
-
-        pidOutputMetersPerSecond = MathUtil.clamp(pidOutputMetersPerSecond, -maxSpeedMetersPerSecond, maxSpeedMetersPerSecond);
-        double xMetersPerSecond = pidOutputMetersPerSecond*error.getAngle().getCos();
-        double yMetersPerSecond = pidOutputMetersPerSecond*error.getAngle().getSin();
-        
-        fieldOrientedDriveWhileAiming(
-            new ChassisSpeeds(
-                xMetersPerSecond,
-                yMetersPerSecond,
-                0
-            ),
-            desired.getRotation()
-        );
-    }
-
-    public void stopMusic() {
-        for (SwerveModule mod : swerveModules) {
-            mod.stopMusic(); 
-        }
-    }
-
-
     @Override
     public void periodic() {
-        // Logger.recordOutput("shift Timer", getShiftTeleTimer());
-        // Logger.recordOutput("Time Till End", Shift.getSecondsTillEnd());
         for (SwerveModule mod : swerveModules)
             mod.periodic();
         
