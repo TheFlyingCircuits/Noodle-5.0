@@ -32,41 +32,41 @@
    "val":68.0388555
   },
   "inertia":{
-   "exp":"6 kg m ^ 2",
-   "val":6.0
+   "exp":"10 kg m ^ 2",
+   "val":10.0
   },
   "gearing":{
-   "exp":"6.5",
-   "val":6.5
+   "exp":"7.03125",
+   "val":7.03125
   },
   "radius":{
-   "exp":"2 in",
-   "val":0.0508
+   "exp":"1.97627 in",
+   "val":0.050197257999999995
   },
   "vmax":{
    "exp":"5800 RPM",
    "val":607.3745796940267
   },
   "tmax":{
-   "exp":"1.2 N * m",
-   "val":1.2
+   "exp":"0.7 N * m",
+   "val":0.7
   },
   "cof":{
-   "exp":"1.5",
-   "val":1.5
+   "exp":"1.2",
+   "val":1.2
   },
   "bumper":{
    "front":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"25.5 in",
+    "val":0.6476999999999999
    },
    "side":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"17 in",
+    "val":0.4318
    },
    "back":{
-    "exp":"16 in",
-    "val":0.4064
+    "exp":"17 in",
+    "val":0.4318
    }
   },
   "differentialTrackWidth":{

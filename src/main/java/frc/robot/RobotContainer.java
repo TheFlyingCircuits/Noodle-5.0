@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Optional;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -16,15 +18,19 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-
+import choreo.Choreo;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.HumanDriver;
@@ -39,6 +45,10 @@ public class RobotContainer {
     public final Drivetrain drivetrain;
     protected final HumanDriver duncan = new HumanDriver(0);
     final CommandXboxController duncanController;
+
+    Timer pathTimer;
+    Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory("Example_auto_1");
+    Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
 
     private SwerveDriveSimulation swerveDriveSimulation;
     
@@ -105,6 +115,7 @@ public class RobotContainer {
         drivetrain.odometry.setPoseMeters(new Pose2d(3, 3, new Rotation2d()));
 
         SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
+        pathTimer = new Timer();
     }
 
     duncanController = duncan.getXboxController();
@@ -129,11 +140,19 @@ public class RobotContainer {
 
   /** Called by Robot.java, convenience function for logging. */
   public void periodic() {
+    drivetrain.odometry.setPoseMeters(swerveDriveSimulation.getSimulatedDriveTrainPose());
     Logger.recordOutput("robotContainer/simulatedDrivetrainPoseMeters", swerveDriveSimulation.getSimulatedDriveTrainPose());
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> pathTimer.restart()),
+      drivetrain.run(() -> {drivetrain.followTrajectory(trajectory.get().sampleAt(pathTimer.get(), false).get());})
+        .until(() -> drivetrain.isAtEndOfTrajectory(0.04, 0.01, trajectory.get().getFinalSample(false).get())),
+        Commands.waitSeconds(1),
+      new InstantCommand(() -> pathTimer.restart()),
+      drivetrain.run(() -> {drivetrain.followTrajectory(trajectory2.get().sampleAt(pathTimer.get(), false).get());})
+    );
   }
 
 

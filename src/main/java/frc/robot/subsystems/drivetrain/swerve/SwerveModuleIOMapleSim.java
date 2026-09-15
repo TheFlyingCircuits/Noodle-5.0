@@ -57,7 +57,7 @@ public class SwerveModuleIOMapleSim implements SwerveModuleIO {
     @Override
     public void setDriveVelocity(double velocityMetersPerSecond) {
         double velocityRotationsPerSecondDriveWheels = velocityMetersPerSecond/SwerveModuleConstants.wheelCircumferenceMeters;
-        double velocityRotationsPerSecondDriveMotor = velocityRotationsPerSecondDriveWheels/SwerveModuleConstants.driveGearReduction;
+        double velocityRotationsPerSecondDriveMotor = velocityRotationsPerSecondDriveWheels;///SwerveModuleConstants.driveGearReduction;
         
         double outputVolts = feedForwardDrive.calculate(velocityRotationsPerSecondDriveMotor);
         setDriveVoltage(outputVolts);

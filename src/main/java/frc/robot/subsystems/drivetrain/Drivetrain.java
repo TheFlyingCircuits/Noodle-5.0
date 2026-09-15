@@ -1,10 +1,11 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.util.ArrayList;
+
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.simulation.VisionTargetSim;
 
-import edu.wpi.first.math.MathUtil;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,7 +15,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldConstants;
@@ -29,12 +29,10 @@ public class Drivetrain extends SubsystemBase {
 
     public Odometry odometry;
 
-    /** error measured in degrees, output is in degrees per second. */
-    private PIDController angleController;
+    private final PIDController xController = new PIDController(1.0, 0.0, 0.0);
+    private final PIDController yController = new PIDController(1.0, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(1.0, 0.0, 0.0);
 
-    /** error measured in meters, output is in meters per second. */
-    private PIDController translationController;
- 
     public Drivetrain(
         GyroIO gyroIO, 
         SwerveModuleIO flSwerveModuleIO, 
@@ -42,7 +40,8 @@ public class Drivetrain extends SubsystemBase {
         SwerveModuleIO blSwerveModuleIO, 
         SwerveModuleIO brSwerveModuleIO
     ) {
-        
+
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
 
         swerveModules = new SwerveModule[] {
             new SwerveModule(flSwerveModuleIO, 0, "frontLeft"),
@@ -92,14 +91,6 @@ public class Drivetrain extends SubsystemBase {
     */
     public void robotOrientedDrive(ChassisSpeeds desiredChassisSpeeds) {
         SwerveModuleState[] swerveModuleStates = DrivetrainConstants.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
-        // Note: it is important to not discretize speeds before or after
-        // using the setpoint generator, as it will discretize them for you
-        // previousSetpoint = setpointGenerator.generateSetpoint(
-        //     previousSetpoint, // The previous setpoint
-        //     desiredChassisSpeeds, // The desired target speeds
-        //     0.02 // The loop time of the robot code, in seconds
-        // );
-        // setModuleStates(previousSetpoint.moduleStates());
         setModuleStates(swerveModuleStates);
     }
 
@@ -129,6 +120,43 @@ public class Drivetrain extends SubsystemBase {
         ChassisSpeeds v = getFieldOrientedVelocity();
         double s = Math.hypot(v.vxMetersPerSecond, v.vyMetersPerSecond);
         return s;
+    }
+
+    // path following
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = odometry.getPoseMeters();
+        Logger.recordOutput("choreo target pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
+
+        // Generate the next velocities for the robot
+        ChassisSpeeds velocities = new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+
+        // Apply the generated velocities
+        fieldOrientedDrive(velocities);
+    }
+
+    public boolean isAtEndOfTrajectory(double toleranceMeters, double velocityToleranceMPS, SwerveSample finalSample) {
+        Pose2d pose = odometry.getPoseMeters();
+
+        // see if the linear distance between current robot pose and final path pose is within tolerance
+        if(pose.getTranslation().getDistance(new Translation2d(finalSample.x, finalSample.y)) <= toleranceMeters) {
+            // gets the velocity delta from chassis speeds class 
+            ChassisSpeeds velocityDelta = getFieldOrientedVelocity().minus(finalSample.getChassisSpeeds());
+            double vxError = Math.abs(velocityDelta.vxMetersPerSecond);
+            double vyError = Math.abs(velocityDelta.vyMetersPerSecond);
+
+            // checks if vx and vy are in tolerance
+            if((vxError <= velocityToleranceMPS) && (vyError <= velocityToleranceMPS)) {
+                return true;
+            }
+
+        }
+        // if it got to this point then the path isn't done
+        return false;
     }
 
     @Override
