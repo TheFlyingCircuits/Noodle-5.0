@@ -25,6 +25,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.PlayingField.FieldElement;
 import frc.robot.subsystems.HumanDriver;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOMapleSim;
@@ -47,7 +50,6 @@ public class RobotContainer {
     final CommandXboxController duncanController;
 
     Timer pathTimer;
-    Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory("Example_auto_1");
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
 
     private SwerveDriveSimulation swerveDriveSimulation;
@@ -130,28 +132,63 @@ public class RobotContainer {
       // canLedsCounter.setDefaultCommand(canLedsCounter.solidColorCommand(Color.fromHSV(canLedsCounter.getAllianceHue(), 255, 255)).ignoringDisable(true));
   }
 
-      private Command driverFullyControlDrivetrain() { return drivetrain.run(() -> {
-        drivetrain.fieldOrientedDrive(duncan.getRequestedFieldOrientedVelocity());
-        Logger.recordOutput("drivetrain/runningDefaultCommand", true);
-        }).finallyDo(() -> {
-            Logger.recordOutput("drivetrain/runningDefaultCommand", false);
-        }).withName("driverFullyControlDrivetrain");
-    }
+  private Command driverFullyControlDrivetrain() { return drivetrain.run(() -> {
+    drivetrain.fieldOrientedDrive(duncan.getRequestedFieldOrientedVelocity());
+    Logger.recordOutput("drivetrain/runningDefaultCommand", true);
+    }).finallyDo(() -> {
+        Logger.recordOutput("drivetrain/runningDefaultCommand", false);
+    }).withName("driverFullyControlDrivetrain");
+  }
+
+  public boolean isOnRightSideField() {
+
+    // gets linear distance from robot pose to both trech poses and checks what trench is closer
+    double distFromLeftTrench = drivetrain.odometry.getPoseMeters().getTranslation().getDistance(FieldElement.TRENCH_LEFT.getLocation2d());
+    double distFromRightTrench = drivetrain.odometry.getPoseMeters().getTranslation().getDistance(FieldElement.TRENCH_RIGHT.getLocation2d());
+
+    return (distFromRightTrench < distFromLeftTrench);
+  }
+  
+  public Command followChoreoTrajoectory(String trajName, double toleranceMeters, double velocityToleranceMPS) {
+    // gets trajectory from choreo file and checks if it exists and if not returns
+    Optional<Trajectory<SwerveSample>> optionalTrajectory = Choreo.loadTrajectory(trajName);
+    if(optionalTrajectory.isEmpty()) return new InstantCommand();
+
+    // gets alliance value and sees if mirrors path so robot follows correct path
+    final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+
+    boolean shouldMirror = isOnRightSideField();
+    Trajectory<SwerveSample> trajectory = shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
+    
+    // restarts path timer to 0 for path following
+    // runs path until it reaches within position and tolerance of end of path
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> pathTimer.restart()),
+      drivetrain.run(() -> {drivetrain.followTrajectory(trajectory, pathTimer.get(), isRedAlliance);})
+        .until(() -> drivetrain.isAtEndOfTrajectory(toleranceMeters, velocityToleranceMPS, trajectory.getFinalSample(isRedAlliance).get()))
+    );
+  }
 
   /** Called by Robot.java, convenience function for logging. */
   public void periodic() {
-    drivetrain.odometry.setPoseMeters(swerveDriveSimulation.getSimulatedDriveTrainPose());
-    Logger.recordOutput("robotContainer/simulatedDrivetrainPoseMeters", swerveDriveSimulation.getSimulatedDriveTrainPose());
+    // if in sim set fused pose to maple sim pose and log it
+    if(RobotBase.isSimulation()) {
+      drivetrain.odometry.setPoseMeters(swerveDriveSimulation.getSimulatedDriveTrainPose());
+      Logger.recordOutput("robotContainer/simulatedDrivetrainPoseMeters", swerveDriveSimulation.getSimulatedDriveTrainPose());
+    }
   }
 
   public Command getAutonomousCommand() {
+    return trenchShallowAuto();
+  }
+
+  public Command trenchShallowAuto() {
+    // need to replace Commands.wait with shooting and add intake and stuff
     return new SequentialCommandGroup(
-      new InstantCommand(() -> pathTimer.restart()),
-      drivetrain.run(() -> {drivetrain.followTrajectory(trajectory.get().sampleAt(pathTimer.get(), false).get());})
-        .until(() -> drivetrain.isAtEndOfTrajectory(0.04, 0.01, trajectory.get().getFinalSample(false).get())),
-        Commands.waitSeconds(1),
-      new InstantCommand(() -> pathTimer.restart()),
-      drivetrain.run(() -> {drivetrain.followTrajectory(trajectory2.get().sampleAt(pathTimer.get(), false).get());})
+      followChoreoTrajoectory("Example_auto_1", 0.1, 0.1),
+      Commands.waitSeconds(1),
+      followChoreoTrajoectory("Example_auto_p2", 0.1, 0.1),
+      Commands.waitSeconds(1)
     );
   }
 

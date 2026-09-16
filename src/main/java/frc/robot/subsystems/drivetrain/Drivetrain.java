@@ -6,6 +6,7 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.simulation.VisionTargetSim;
 
 import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,9 +30,9 @@ public class Drivetrain extends SubsystemBase {
 
     public Odometry odometry;
 
-    private final PIDController xController = new PIDController(1.0, 0.0, 0.0);
-    private final PIDController yController = new PIDController(1.0, 0.0, 0.0);
-    private final PIDController headingController = new PIDController(1.0, 0.0, 0.0);
+    private final PIDController xController = new PIDController(1.5, 0.0, 0.0);
+    private final PIDController yController = new PIDController(1.5, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(3.0, 0.0, 0.0);
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -123,10 +124,13 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // path following
-    public void followTrajectory(SwerveSample sample) {
+    public void followTrajectory(Trajectory<SwerveSample> trajectory, double timeSec, boolean isRedAlliance) {
+        SwerveSample finalSample= trajectory.getFinalSample(isRedAlliance).get();
+        SwerveSample sample = finalSample.t <= timeSec ? finalSample : trajectory.sampleAt(timeSec, isRedAlliance).get();
+
         // Get the current pose of the robot
         Pose2d pose = odometry.getPoseMeters();
-        Logger.recordOutput("choreo target pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
+        System.out.println(pose.getX());
 
         // Generate the next velocities for the robot
         ChassisSpeeds velocities = new ChassisSpeeds(
