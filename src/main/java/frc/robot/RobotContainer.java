@@ -152,7 +152,7 @@ public class RobotContainer {
   public Command followChoreoTrajoectory(String trajName, double toleranceMeters, double velocityToleranceMPS) {
     // gets trajectory from choreo file and checks if it exists and if not returns
     Optional<Trajectory<SwerveSample>> optionalTrajectory = Choreo.loadTrajectory(trajName);
-    if(optionalTrajectory.isEmpty()) return new InstantCommand();
+    if(optionalTrajectory.isEmpty()) return Commands.print("path does not exist returning.");
 
     // gets alliance value and sees if mirrors path so robot follows correct path
     final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
@@ -165,7 +165,7 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new InstantCommand(() -> pathTimer.restart()),
       drivetrain.run(() -> {drivetrain.followTrajectory(trajectory, pathTimer.get(), isRedAlliance);})
-        .until(() -> drivetrain.isAtEndOfTrajectory(toleranceMeters, velocityToleranceMPS, trajectory.getFinalSample(isRedAlliance).get()))
+        .until(() -> drivetrain.isAtEndOfTrajectory(toleranceMeters, velocityToleranceMPS, pathTimer.get(), trajectory.getFinalSample(isRedAlliance).get()))
     );
   }
 
@@ -187,7 +187,9 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       followChoreoTrajoectory("Example_auto_1", 0.1, 0.1),
       Commands.waitSeconds(1),
+      Commands.print("first path done!"),
       followChoreoTrajoectory("Example_auto_p2", 0.1, 0.1),
+      Commands.print("second path done!"),
       Commands.waitSeconds(1)
     );
   }

@@ -30,9 +30,9 @@ public class Drivetrain extends SubsystemBase {
 
     public Odometry odometry;
 
-    private final PIDController xController = new PIDController(1.5, 0.0, 0.0);
-    private final PIDController yController = new PIDController(1.5, 0.0, 0.0);
-    private final PIDController headingController = new PIDController(3.0, 0.0, 0.0);
+    private final PIDController xController = new PIDController(1.3, 0.0, 0.0);
+    private final PIDController yController = new PIDController(1.3, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(2.3, 0.0, 0.0);
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -52,6 +52,7 @@ public class Drivetrain extends SubsystemBase {
         };
 
         this.odometry = new Odometry(this, gyroIO);
+         Logger.recordOutput("choreo target pose", new Pose2d(0, 0, new Rotation2d()));
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -130,7 +131,7 @@ public class Drivetrain extends SubsystemBase {
 
         // Get the current pose of the robot
         Pose2d pose = odometry.getPoseMeters();
-        System.out.println(pose.getX());
+         Logger.recordOutput("choreo target pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
 
         // Generate the next velocities for the robot
         ChassisSpeeds velocities = new ChassisSpeeds(
@@ -143,8 +144,11 @@ public class Drivetrain extends SubsystemBase {
         fieldOrientedDrive(velocities);
     }
 
-    public boolean isAtEndOfTrajectory(double toleranceMeters, double velocityToleranceMPS, SwerveSample finalSample) {
+    public boolean isAtEndOfTrajectory(double toleranceMeters, double velocityToleranceMPS, double timeSec, SwerveSample finalSample) {
         Pose2d pose = odometry.getPoseMeters();
+
+        // if the current time is less than 50% of the time it should take to do the path assume path is not done
+        if((timeSec / finalSample.t) < 0.5) return false;
 
         // see if the linear distance between current robot pose and final path pose is within tolerance
         if(pose.getTranslation().getDistance(new Translation2d(finalSample.x, finalSample.y)) <= toleranceMeters) {
