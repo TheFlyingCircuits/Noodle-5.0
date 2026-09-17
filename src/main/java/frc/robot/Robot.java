@@ -11,7 +11,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -24,11 +23,6 @@ public class Robot extends LoggedRobot  {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
-    initAdvantageKit();
-    m_robotContainer = new RobotContainer();
-
-    DriverStation.silenceJoystickConnectionWarning(true);
-
     if(RobotBase.isSimulation()) {
       // Obtains the default instance of the simulation world, which is a Crescendo Arena.
       SimulatedArena.getInstance();
@@ -37,6 +31,11 @@ public class Robot extends LoggedRobot  {
       // Overrides the default simulation
       // SimulatedArena.overrideInstance(); 
     }
+
+    initAdvantageKit();
+    m_robotContainer = new RobotContainer();
+
+    DriverStation.silenceJoystickConnectionWarning(true);
   }
 
   private void initAdvantageKit() {
@@ -67,10 +66,10 @@ public class Robot extends LoggedRobot  {
 
 public void simulationPeriod() {
   // Get the positions of the fuel (both on the field and in the air)
-  Pose3d[] fuelPoses = SimulatedArena.getInstance()
-        .getGamePiecesArrayByType("Fuel");
-  // Publish to telemetry using AdvantageKit
-  Logger.recordOutput("FieldSimulation/FuelPositions", fuelPoses);
+  // Pose3d[] fuelPoses = SimulatedArena.getInstance()
+  //       .getGamePiecesArrayByType("Fuel");
+  // // Publish to telemetry using AdvantageKit
+  // Logger.recordOutput("FieldSimulation/FuelPositions", fuelPoses);
   SimulatedArena.getInstance().simulationPeriodic();
 }
 
