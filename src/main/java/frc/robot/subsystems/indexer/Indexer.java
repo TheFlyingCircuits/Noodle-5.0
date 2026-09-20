@@ -26,6 +26,7 @@ private final SimpleMotorFeedforward velocityFeedforward =
         this.io = io;
     }
 
+    // gets periodically called every 20 ms
     @Override
     public void periodic() {
         io.updateInputs(inputs);
@@ -35,8 +36,14 @@ private final SimpleMotorFeedforward velocityFeedforward =
         return this.run(() -> io.setIndexerVolts(volts));
     }
 
+    /**
+     * Uses feed forward and PID to calculate voltage from input target velocity
+     *
+     * @param targetRPM The desired RPM of the indexer motors
+     * @return A runnable command that runs the velocity
+     */
     public Command setIndexerVelocity(double targetRPM) {
-    return this.runEnd(
+    return this.run(
         () -> {
             double measuredRPM = inputs.indexerFLVelocity;
 
@@ -45,24 +52,26 @@ private final SimpleMotorFeedforward velocityFeedforward =
 
             double outputVolts = MathUtil.clamp(
                 feedforwardVolts + feedbackVolts,
-                -12.0,
-                12.0);
+                -8.0,
+                8.0);
 
             io.setIndexerVolts(outputVolts);
-        },
-        () -> {
-            io.setIndexerVolts(0.0);
-            velocityPID.reset();
         });
-}
+    }
 
+    /**
+     * default indexer command that periodically checks if the can range sensor is within tolerance and if so our hopper is full enougth to fill our feeder with fuel.
+     * If the fuel is not within tolerance of the can range sensor then the indexer voltage will be set to 0.
+     *
+     * @param targetRPM The desired RPM of the indexer motors
+     * @return A runnable command that will fill out feeder with fuel if in tolerance
+     */
     public Command setIndexerVelocityWhenLoaded(double targetRPM) {
-        return this.runEnd(
+        return this.run(
             () -> setIndexerVelocity(
                 inputs.indexerRangeDistanceMeters < Constants.IndexerConstants.indexerRangeThresholdMeters
                     ? targetRPM
-                    : 0.0),
-            () -> io.setIndexerVolts(0.0));
+                    : 0.0));
     }
     
 
