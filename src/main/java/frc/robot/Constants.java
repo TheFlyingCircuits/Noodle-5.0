@@ -188,11 +188,28 @@ public final class Constants {
     public final static class GyroConstants {
         public static final int pigeonID = 50;
 
-
         //Follow the mount calibration process in Phoenix Tuner to determine these
         public static final double mountPoseYawDegrees = -90.45111083984375;
         public static final double mountPosePitchDegrees = -16.21670913696289;
         public static final double mountPoseRollDegrees = 89.97844696044922;
+    }
+    
+    public final static class IndexerConstants {
+        public static final int indexerFLId = 0;
+        public static final int indexerFRId = 1;
+        public static final int indexerBLId = 2;
+        public static final int indexerBRId = 3;
+        public static final int indexerRangeId = 4;
+        public static final double indexerRangeThresholdMeters = 0.1;
+
+        public static final double velocityKpVoltsPerRPM = 0.002;
+        public static final double velocityKiVoltsPerRPMSecond = 0.0;
+        public static final double velocityKdVoltsPerRPMPerSecond = 0.0;
+            
+        public static final double velocityKsVolts = 0.2;
+        public static final double velocityKvVoltsPerRPM = 12.0 / 5820.0;
+        public static final double simVelocityTimeConstantSeconds = 0.1;
+
     }
 
     public final static class VisionConstants {

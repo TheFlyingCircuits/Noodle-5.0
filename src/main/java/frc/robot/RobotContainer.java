@@ -42,12 +42,17 @@ import frc.robot.subsystems.drivetrain.gyro.GyroIOMapleSim;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
 import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIOKraken;
 import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIOMapleSim;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIONeo;
+import frc.robot.subsystems.indexer.IndexerIOSim;
 
 public class RobotContainer {
 
     public final Drivetrain drivetrain;
     protected final HumanDriver duncan = new HumanDriver(0);
     final CommandXboxController duncanController;
+
+    public Indexer indexer;
 
     Timer pathTimer;
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
@@ -65,6 +70,7 @@ public class RobotContainer {
             new SwerveModuleIOKraken(5, 6, -0.033203, 3, "BL", true),
             new SwerveModuleIOKraken(7, 8,  0.098389, 4, "BR", false) 
         );
+        indexer = new Indexer(new IndexerIONeo());
     } else {
         // drivetrain = new Drivetrain(
         //     new GyroIOSim(){},
@@ -115,6 +121,8 @@ public class RobotContainer {
         );
 
         drivetrain.odometry.setPoseMeters(new Pose2d(3, 3, new Rotation2d()));
+
+        indexer = new Indexer(new IndexerIOSim());
 
         SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
         pathTimer = new Timer();
@@ -176,6 +184,7 @@ public class RobotContainer {
       drivetrain.odometry.setPoseMeters(swerveDriveSimulation.getSimulatedDriveTrainPose());
       Logger.recordOutput("robotContainer/simulatedDrivetrainPoseMeters", swerveDriveSimulation.getSimulatedDriveTrainPose());
     }
+    
   }
 
   public Command getAutonomousCommand() {
