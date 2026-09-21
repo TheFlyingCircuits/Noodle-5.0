@@ -209,6 +209,7 @@ public final class Constants {
         public static final double velocityKsVolts = 0.2;
         public static final double velocityKvVoltsPerRPM = 12.0 / 5820.0;
         public static final double simVelocityTimeConstantSeconds = 0.1;
+        public static final double indexerRangeDebounceSeconds = 0.1;
 
     }
 
