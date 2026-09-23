@@ -7,6 +7,7 @@ import org.photonvision.simulation.VisionTargetSim;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,9 +32,12 @@ public class Drivetrain extends SubsystemBase {
 
     public Odometry odometry;
 
-    private final PIDController xController = new PIDController(6, 0.1, 0.0);
-    private final PIDController yController = new PIDController(6, 0.1, 0.0);
+    private final PIDController xController = new PIDController(5.5, 0.1, 0.0);
+    private final PIDController yController = new PIDController(5.5, 0.1, 0.0);
     private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
+
+    // 12 m/s^2 and the 0.02 is the loops time of 20 ms
+    double arbitraryAcelLimitPerLoop = 60.0 * 0.02;
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -93,7 +97,23 @@ public class Drivetrain extends SubsystemBase {
      * @param closedLoop - Whether or not to used closed loop PID control to control the speed of the drive wheels.
     */
     public void robotOrientedDrive(ChassisSpeeds desiredChassisSpeeds) {
-        SwerveModuleState[] swerveModuleStates = DrivetrainConstants.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+        ChassisSpeeds currentSpeeds = getRobotRelativeVelocityMPS();
+
+        // Limit x acceleration and deceleration
+        double minX = currentSpeeds.vxMetersPerSecond - arbitraryAcelLimitPerLoop;
+        double maxX = currentSpeeds.vxMetersPerSecond + arbitraryAcelLimitPerLoop;
+        double limitedVx = MathUtil.clamp(desiredChassisSpeeds.vxMetersPerSecond, minX, maxX);
+
+        // Limit yacceleration and deceleration
+        double minY = currentSpeeds.vyMetersPerSecond - arbitraryAcelLimitPerLoop;
+        double maxY = currentSpeeds.vyMetersPerSecond + arbitraryAcelLimitPerLoop;
+        double limitedVy = MathUtil.clamp(desiredChassisSpeeds.vyMetersPerSecond, minY, maxY);
+        // gets now the limited speeds and uses hypot*cos(angle theta) = adjecent
+        ChassisSpeeds limitedSpeeds = new ChassisSpeeds(limitedVx, 
+            limitedVy, desiredChassisSpeeds.omegaRadiansPerSecond);
+
+        SwerveModuleState[] swerveModuleStates = DrivetrainConstants.swerveKinematics.toSwerveModuleStates(limitedSpeeds);
+
         setModuleStates(swerveModuleStates);
     }
 
