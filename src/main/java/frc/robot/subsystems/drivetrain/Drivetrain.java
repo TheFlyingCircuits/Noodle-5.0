@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldConstants;
@@ -30,9 +31,9 @@ public class Drivetrain extends SubsystemBase {
 
     public Odometry odometry;
 
-    private final PIDController xController = new PIDController(1.3, 0.0, 0.0);
-    private final PIDController yController = new PIDController(1.3, 0.0, 0.0);
-    private final PIDController headingController = new PIDController(2.3, 0.0, 0.0);
+    private final PIDController xController = new PIDController(6, 0.1, 0.0);
+    private final PIDController yController = new PIDController(6, 0.1, 0.0);
+    private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -125,9 +126,9 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // path following
-    public void followTrajectory(Trajectory<SwerveSample> trajectory, double timeSec, boolean isRedAlliance) {
+    public void followTrajectory(Trajectory<SwerveSample> trajectory, Timer timer, boolean isRedAlliance) {
         SwerveSample finalSample= trajectory.getFinalSample(isRedAlliance).get();
-        SwerveSample sample = finalSample.t <= timeSec ? finalSample : trajectory.sampleAt(timeSec, isRedAlliance).get();
+        SwerveSample sample = finalSample.t <= timer.get() ? finalSample : trajectory.sampleAt(timer.get(), isRedAlliance).get();
 
         // Get the current pose of the robot
         Pose2d pose = odometry.getPoseMeters();
@@ -140,6 +141,53 @@ public class Drivetrain extends SubsystemBase {
             sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
 
+        // Apply the generated velocities
+        fieldOrientedDrive(velocities);
+    }
+
+    // checkpoint following 
+    public void followCheckpointsTrajectory(Trajectory<SwerveSample> trajectory, Timer timer, boolean isRedAlliance, double checkpointToleranceMeters) {
+        SwerveSample finalSample= trajectory.getFinalSample(isRedAlliance).get();
+        SwerveSample sample = finalSample.t <= timer.get() ? finalSample : trajectory.sampleAt(timer.get(), isRedAlliance).get();
+
+        // Get the current pose of the robot
+        Pose2d currentPose = odometry.getPoseMeters();
+        Pose2d choreoTargetPose = new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading));
+        Logger.recordOutput("choreo target pose", new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading)));
+
+        // initializes the target velocities chassis speeds that we input into field oriented drive
+        ChassisSpeeds velocities;
+
+        // checks if robot error is too much and if so just use pid to get back to last checkpoint/sample pose
+        // and also use 50% of feedforward velocity
+        if(checkpointToleranceMeters < Math.abs(choreoTargetPose.minus(currentPose).getTranslation().getNorm())) {
+
+            // stop running the timer that is used for setpoints if timer is running
+            if(timer.isRunning()) {
+                timer.stop();
+            }
+
+            // use 50% of feed forward to less fight the pid if the pose is really off
+            velocities = new ChassisSpeeds(
+                sample.vx*0.5 + xController.calculate(currentPose.getX(), sample.x),
+                sample.vy*0.5 + yController.calculate(currentPose.getY(), sample.y),
+                sample.omega*0.5 + headingController.calculate(currentPose.getRotation().getRadians(), sample.heading)
+            );
+        } else {
+
+            // if tiemer is not running start it up again
+            if(!timer.isRunning()) {
+                timer.start();
+            }
+
+            // Generate the next velocities for the robot
+            velocities = new ChassisSpeeds(
+                sample.vx + xController.calculate(currentPose.getX(), sample.x),
+                sample.vy + yController.calculate(currentPose.getY(), sample.y),
+                sample.omega + headingController.calculate(currentPose.getRotation().getRadians(), sample.heading)
+            );
+        }
+    
         // Apply the generated velocities
         fieldOrientedDrive(velocities);
     }

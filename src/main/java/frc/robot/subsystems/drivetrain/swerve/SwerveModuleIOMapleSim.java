@@ -48,7 +48,7 @@ public class SwerveModuleIOMapleSim implements SwerveModuleIO {
         // set a current limit of 60 amps
         this.driveMotor = moduleSimulation
                 .useGenericMotorControllerForDrive()
-                .withCurrentLimit(Current.ofRelativeUnits(40, Amps));
+                .withCurrentLimit(Current.ofRelativeUnits(60, Amps));
         this.steerMotor = moduleSimulation
                 .useGenericControllerForSteer()
                 .withCurrentLimit(Current.ofRelativeUnits(45, Amps));

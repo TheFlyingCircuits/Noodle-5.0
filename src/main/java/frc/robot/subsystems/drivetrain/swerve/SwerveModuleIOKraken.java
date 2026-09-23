@@ -82,7 +82,7 @@ public class SwerveModuleIOKraken implements SwerveModuleIO {
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = invertedValue;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.CurrentLimits.StatorCurrentLimit = 40; // re-determined after firmware upgrade to prevent wheel slip. Feels pretty low though
+        config.CurrentLimits.StatorCurrentLimit = 60; // re-determined after firmware upgrade to prevent wheel slip. Feels pretty low though
 
         config.Slot1.kS = 0.25; 
         config.Slot1.kV = 0.872844827583;// 2.1volts - 0.8 mps

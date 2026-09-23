@@ -85,7 +85,7 @@ public class RobotContainer {
         // Specify swerve module (for realistic swerve dynamics)
         .withSwerveModule(new SwerveModuleSimulationConfig(
                 DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
-                DCMotor.getNEO(1), // Steer motor is a Falcon 500
+                DCMotor.getKrakenX44(1), // Steer motor is a Krakne x44
                 1.0/Constants.SwerveModuleConstants.driveGearReduction, // Drive motor gear ratio.
                 1.0/Constants.SwerveModuleConstants.steerGearReduction, // Steer motor gear ratio.
                 Volts.of(0.25), // Drive friction voltage.
@@ -172,7 +172,27 @@ public class RobotContainer {
     // runs path until it reaches within position and tolerance of end of path
     return new SequentialCommandGroup(
       new InstantCommand(() -> pathTimer.restart()),
-      drivetrain.run(() -> {drivetrain.followTrajectory(trajectory, pathTimer.get(), isRedAlliance);})
+      drivetrain.run(() -> {drivetrain.followTrajectory(trajectory, pathTimer, isRedAlliance);})
+        .until(() -> drivetrain.isAtEndOfTrajectory(toleranceMeters, velocityToleranceMPS, pathTimer.get(), trajectory.getFinalSample(isRedAlliance).get()))
+    );
+  }
+
+  public Command followChoreoCheckpointTrajoectory(String trajName, double toleranceMeters, double velocityToleranceMPS) {
+    // gets trajectory from choreo file and checks if it exists and if not returns
+    Optional<Trajectory<SwerveSample>> optionalTrajectory = Choreo.loadTrajectory(trajName);
+    if(optionalTrajectory.isEmpty()) return Commands.print("path does not exist returning.");
+
+    // gets alliance value and sees if mirrors path so robot follows correct path
+    final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+
+    boolean shouldMirror = isOnRightSideField();
+    Trajectory<SwerveSample> trajectory = shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
+    
+    // restarts path timer to 0 for path following
+    // runs path until it reaches within position and tolerance of end of path
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> pathTimer.restart()),
+      drivetrain.run(() -> {drivetrain.followCheckpointsTrajectory(trajectory, pathTimer, isRedAlliance, toleranceMeters);})
         .until(() -> drivetrain.isAtEndOfTrajectory(toleranceMeters, velocityToleranceMPS, pathTimer.get(), trajectory.getFinalSample(isRedAlliance).get()))
     );
   }
@@ -194,10 +214,10 @@ public class RobotContainer {
   public Command trenchShallowAuto() {
     // need to replace Commands.wait with shooting and add intake and stuff
     return new SequentialCommandGroup(
-      followChoreoTrajoectory("Example_auto_1", 0.1, 0.1),
+      followChoreoCheckpointTrajoectory("Example_auto_1", 0.3, 0.1),
       Commands.waitSeconds(1),
       Commands.print("first path done!"),
-      followChoreoTrajoectory("Example_auto_p2", 0.1, 0.1),
+      followChoreoCheckpointTrajoectory("Example_auto_p2", 0.3, 0.1),
       Commands.print("second path done!"),
       Commands.waitSeconds(1)
     );
