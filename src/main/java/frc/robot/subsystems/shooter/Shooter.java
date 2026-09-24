@@ -13,7 +13,6 @@ public class Shooter extends SubsystemBase {
     private final ShooterIOInputs inputs = new ShooterIOInputs();
 
     // used to eliminate teleportation affeting lookup table
-    private final SlewRateLimiter distanceLimiter = new SlewRateLimiter(Constants.DrivetrainConstants.maxAchievableVelocityMetersPerSecond);
 
     public Shooter(ShooterIO io) {
         this.io = io;
@@ -24,13 +23,11 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
-    private void setShotForRobotPosition(Translation2d robotPosition) {
-        double distanceToHubMeters = distanceLimiter.calculate(robotPosition.minus(FieldConstants.midField).getNorm());
-        Double shotVelocity = Constants.ShooterConstants.velocityMap.get(distanceToHubMeters);
-        Double shotAngle = Constants.ShooterConstants.angleMap.get(distanceToHubMeters);
+    private void setShot(double velocity, double position) {
+       
 
-        io.setShooterVelocity(shotVelocity);
-        io.setPivotAngle(shotAngle);    
+        io.setShooterVelocity(velocity);
+        io.setPivotAngle(position);    
     }
 
     public double getCurrentShooterRPM() {
@@ -41,8 +38,8 @@ public class Shooter extends SubsystemBase {
         return inputs.pivotAngleDegrees;
     }
 
-    public Command shootAtPositionCommand(Translation2d robotPosition) {
-        return this.run(() -> setShotForRobotPosition(robotPosition));
+    public Command setShotCommand(double velocity, double position) {
+        return this.run(() -> setShot(velocity, position));
     }
 
     public Command setShooterVoltsCommand(double volts) {

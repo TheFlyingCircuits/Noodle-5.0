@@ -225,22 +225,25 @@ public final class Constants {
         public static final int shooterBRId = 8;
         public static final int pivotId = 9;
 
+        // amp limits
         public static final double statorCurrentLimitAmps = 80.0;
         public static final double pivotCurrentLimitAmps = 40.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        public static final double shooterVelocityKp = 0.2;
+        public static final double shooterVelocityKp = 0.0;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
-        public static final double shooterVelocityKs = 0.25;
-        public static final double shooterVelocityKv = 0.12;
+        public static final double shooterVelocityKs = 0.0;
+        public static final double shooterVelocityKv = 0.0;
 
         // Pivot angle PID + feedforward tuning
-        public static final double pivotKp = 2.0;
+        public static final double pivotKp = 0.0;
         public static final double pivotKi = 0.0;
         public static final double pivotKd = 0.0;
-        public static final double pivotKs = 0.2;
+        public static final double pivotKs = 0.0;
         public static final double pivotKv = 0.0;
+
+        // Hub PID + feedworward tuning
 
 
         // lookup table
