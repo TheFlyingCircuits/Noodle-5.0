@@ -18,10 +18,10 @@ public class Indexer extends SubsystemBase {
     Constants.IndexerConstants.velocityKiVoltsPerRPMSecond,
     Constants.IndexerConstants.velocityKdVoltsPerRPMPerSecond);
 
-private final SimpleMotorFeedforward velocityFeedforward =
-    new SimpleMotorFeedforward(
-        Constants.IndexerConstants.velocityKsVolts,
-        Constants.IndexerConstants.velocityKvVoltsPerRPM);
+    private final SimpleMotorFeedforward velocityFeedforward =
+        new SimpleMotorFeedforward(
+            Constants.IndexerConstants.velocityKsVolts,
+            Constants.IndexerConstants.velocityKvVoltsPerRPM);
 
     public Indexer(IndexerIO io) {
         this.io = io;

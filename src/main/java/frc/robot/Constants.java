@@ -5,10 +5,13 @@
 package frc.robot;
 
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
@@ -205,12 +208,49 @@ public final class Constants {
         public static final double velocityKpVoltsPerRPM = 0.002;
         public static final double velocityKiVoltsPerRPMSecond = 0.0;
         public static final double velocityKdVoltsPerRPMPerSecond = 0.0;
-            
+
         public static final double velocityKsVolts = 0.2;
         public static final double velocityKvVoltsPerRPM = 12.0 / 5820.0;
         public static final double simVelocityTimeConstantSeconds = 0.1;
         public static final double indexerRangeDebounceSeconds = 0.1;
 
+    }
+    
+    public final static class ShooterConstants {
+
+        // motor id
+        public static final int shooterTLId = 5;
+        public static final int shooterTRId = 6;
+        public static final int shooterBLId = 7;
+        public static final int shooterBRId = 8;
+        public static final int pivotId = 9;
+
+        public static final double statorCurrentLimitAmps = 80.0;
+        public static final double pivotCurrentLimitAmps = 40.0;
+
+        // Shooter wheel velocity PID + feedforward tuning
+        public static final double shooterVelocityKp = 0.2;
+        public static final double shooterVelocityKi = 0.0;
+        public static final double shooterVelocityKd = 0.0;
+        public static final double shooterVelocityKs = 0.25;
+        public static final double shooterVelocityKv = 0.12;
+
+        // Pivot angle PID + feedforward tuning
+        public static final double pivotKp = 2.0;
+        public static final double pivotKi = 0.0;
+        public static final double pivotKd = 0.0;
+        public static final double pivotKs = 0.2;
+        public static final double pivotKv = 0.0;
+
+
+        // lookup table
+        public static final InterpolatingDoubleTreeMap velocityMap = new InterpolatingDoubleTreeMap();
+        public static final InterpolatingDoubleTreeMap angleMap = new InterpolatingDoubleTreeMap();
+
+        static {
+            velocityMap.put(2.0, 20.0);
+            angleMap.put(2.0, 65.0 );
+        }
     }
 
     public final static class VisionConstants {
