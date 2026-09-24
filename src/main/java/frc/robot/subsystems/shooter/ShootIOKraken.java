@@ -40,15 +40,13 @@ public class ShootIOKraken implements ShooterIO {
 
     private void configureDrumMotors() {
         drumConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         drumConfig.CurrentLimits.StatorCurrentLimit = Constants.ShooterConstants.statorCurrentLimitAmps;
         drumConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         drumConfig.Slot0.kS = Constants.ShooterConstants.shooterVelocityKs;
         drumConfig.Slot0.kV = Constants.ShooterConstants.shooterVelocityKv;
         drumConfig.Slot0.kP = Constants.ShooterConstants.shooterVelocityKp;
-        drumConfig.Slot0.kI = Constants.ShooterConstants.shooterVelocityKi;
-        drumConfig.Slot0.kD = Constants.ShooterConstants.shooterVelocityKd;
 
         drumConfig.Feedback.SensorToMechanismRatio = 1.0;
 
@@ -70,11 +68,9 @@ public class ShootIOKraken implements ShooterIO {
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         pivotConfig.Slot0.kS = Constants.ShooterConstants.pivotKs;
-        pivotConfig.Slot0.kV = Constants.ShooterConstants.pivotKv;
         pivotConfig.Slot0.kP = Constants.ShooterConstants.pivotKp;
-        pivotConfig.Slot0.kI = Constants.ShooterConstants.pivotKi;
-        pivotConfig.Slot0.kD = Constants.ShooterConstants.pivotKd;
 
+        // TODO: this is fake gear ratio because it will prob not be 1:1
         pivotConfig.Feedback.SensorToMechanismRatio = 1.0;
 
         pivot.applyConfig(pivotConfig);
@@ -102,21 +98,13 @@ public class ShootIOKraken implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        inputs.shooterTLVelocity = shooterTL.getVelocity().getValueAsDouble() * 60.0;
-        inputs.shooterTRVelocity = shooterTR.getVelocity().getValueAsDouble() * 60.0;
-        inputs.shooterBLVelocity = shooterBL.getVelocity().getValueAsDouble() * 60.0;
-        inputs.shooterBRVelocity = shooterBR.getVelocity().getValueAsDouble() * 60.0;
+        inputs.shooterVelocity = shooterTL.getVelocity().getValueAsDouble() * 60.0;
 
-        inputs.shooterTLVolts = shooterTL.getMotorVoltage().getValueAsDouble();
-        inputs.shooterTRVolts = shooterTR.getMotorVoltage().getValueAsDouble();
-        inputs.shooterBLVolts = shooterBL.getMotorVoltage().getValueAsDouble();
-        inputs.shooterBRVolts = shooterBR.getMotorVoltage().getValueAsDouble();
+
+        inputs.shooterVolts = shooterTL.getMotorVoltage().getValueAsDouble();
         inputs.pivotVolts = pivot.getMotorVoltage().getValueAsDouble();
 
-        inputs.shooterTLAmps = shooterTL.getStatorCurrent().getValueAsDouble();
-        inputs.shooterTRAmps = shooterTR.getStatorCurrent().getValueAsDouble();
-        inputs.shooterBLAmps = shooterBL.getStatorCurrent().getValueAsDouble();
-        inputs.shooterBRAmps = shooterBR.getStatorCurrent().getValueAsDouble();
+        inputs.shooterAmps = shooterTL.getStatorCurrent().getValueAsDouble();
         inputs.pivotAmps = pivot.getStatorCurrent().getValueAsDouble();
 
         inputs.pivotAngleDegrees = Units.rotationsToDegrees(pivot.getPosition().getValueAsDouble());

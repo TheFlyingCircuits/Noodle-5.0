@@ -6,21 +6,12 @@ public interface ShooterIO {
     
     @AutoLog
     public class ShooterIOInputs {
-        public double shooterTLVelocity = 0.0;
-        public double shooterTRVelocity = 0.0;
-        public double shooterBLVelocity = 0.0;
-        public double shooterBRVelocity = 0.0;
+        public double shooterVelocity = 0.0;
 
-        public double shooterTLVolts = 0.0;
-        public double shooterTRVolts = 0.0;
-        public double shooterBLVolts = 0.0;
-        public double shooterBRVolts = 0.0;
+        public double shooterVolts = 0.0;
         public double pivotVolts = 0.0;
 
-        public double shooterTLAmps = 0.0;
-        public double shooterTRAmps = 0.0;
-        public double shooterBLAmps = 0.0;
-        public double shooterBRAmps = 0.0;
+        public double shooterAmps = 0.0;
         public double pivotAmps = 0.0;
 
         public double pivotAngleDegrees = 0.0;

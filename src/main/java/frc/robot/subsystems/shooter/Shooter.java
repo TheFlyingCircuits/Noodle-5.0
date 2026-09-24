@@ -33,6 +33,14 @@ public class Shooter extends SubsystemBase {
         io.setPivotAngle(shotAngle);    
     }
 
+    public double getCurrentShooterRPM() {
+        return inputs.shooterVelocity;
+    }
+
+    public double getCurrentPivotAngleDegrees() {
+        return inputs.pivotAngleDegrees;
+    }
+
     public Command shootAtPositionCommand(Translation2d robotPosition) {
         return this.run(() -> setShotForRobotPosition(robotPosition));
     }
@@ -53,11 +61,4 @@ public class Shooter extends SubsystemBase {
         return this.run(() -> io.setPivotAngle(targetDegrees));
     }
 
-    public double getCurrentShooterRPM() {
-        return inputs.shooterTLVelocity;
-    }
-
-    public double getCurrentPivotAngleDegrees() {
-        return inputs.pivotAngleDegrees;
-    }
 }
