@@ -244,7 +244,9 @@ public final class Constants {
         public static final double pivotKv = 0.0;
 
         // Hub PID + feedworward tuning
-
+        public static final double shootDrivetrainKp = 0.0;
+        public static final double shootDrivetrainKi = 0.0;
+        public static final double shootDrivetrainKd = 0.0;
 
         // lookup table
         public static final InterpolatingDoubleTreeMap velocityMap = new InterpolatingDoubleTreeMap();

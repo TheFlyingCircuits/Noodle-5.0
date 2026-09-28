@@ -23,7 +23,7 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
-    private void setShot(double velocity, double position) {
+    public void setShot(double velocity, double position) {
        
 
         io.setShooterVelocity(velocity);

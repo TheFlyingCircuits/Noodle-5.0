@@ -13,7 +13,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.VendorWrappers.Kraken;
 
-public class ShootIOKraken implements ShooterIO {
+public class ShooterIOKraken implements ShooterIO {
 
     private Kraken shooterTL;
     private Kraken shooterTR;
@@ -24,7 +24,7 @@ public class ShootIOKraken implements ShooterIO {
     private TalonFXConfiguration drumConfig;
     private TalonFXConfiguration pivotConfig;
 
-    public ShootIOKraken() {
+    public ShooterIOKraken() {
 
         drumConfig = new TalonFXConfiguration();
         pivotConfig = new TalonFXConfiguration();

@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.ShootIntoHubCommand;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldElement;
 import frc.robot.subsystems.HumanDriver;
@@ -45,6 +46,8 @@ import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIOMapleSim;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIONeo;
 import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIOKraken;
 
 public class RobotContainer {
 
@@ -53,6 +56,7 @@ public class RobotContainer {
     final CommandXboxController duncanController;
 
     public Indexer indexer;
+    public Shooter shooter;
 
     Timer pathTimer;
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
@@ -71,6 +75,8 @@ public class RobotContainer {
             new SwerveModuleIOKraken(7, 8,  0.098389, 4, "BR", false) 
         );
         indexer = new Indexer(new IndexerIONeo());
+        shooter = new Shooter(new ShooterIOKraken());
+
     } else {
         // drivetrain = new Drivetrain(
         //     new GyroIOSim(){},
@@ -133,7 +139,9 @@ public class RobotContainer {
     setDefaultCommands();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    duncanController.rightTrigger().onTrue(new ShootIntoHubCommand(drivetrain, shooter));
+  }
 
   public void setDefaultCommands() {
       drivetrain.setDefaultCommand(driverFullyControlDrivetrain().withName("driveDefualtCommand"));
