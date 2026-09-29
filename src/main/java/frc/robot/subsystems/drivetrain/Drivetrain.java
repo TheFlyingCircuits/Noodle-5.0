@@ -37,7 +37,7 @@ public class Drivetrain extends SubsystemBase {
     private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
 
     // 12 m/s^2 and the 0.02 is the loops time of 20 ms
-    double arbitraryAcelLimitPerLoop = 60.0 * 0.02;
+    double arbitraryAcelLimitPerLoop = 70.0 * 0.02;
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -97,7 +97,23 @@ public class Drivetrain extends SubsystemBase {
      * @param closedLoop - Whether or not to used closed loop PID control to control the speed of the drive wheels.
     */
     public void robotOrientedDrive(ChassisSpeeds desiredChassisSpeeds) {
-        ChassisSpeeds currentSpeeds = getRobotRelativeVelocityMPS();
+
+        SwerveModuleState[] swerveModuleStates = DrivetrainConstants.swerveKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+
+        setModuleStates(swerveModuleStates);
+    }
+
+    /**
+     * Drives the robot at a desired chassis speeds. The coordinate system
+     * is the same as the one as the one for setPoseMeters().
+     * 
+     * @param desiredChassisSpeeds - Field relative chassis speeds, in m/s and rad/s. 
+     * @param closedLoop - Whether or not to drive the drive wheels with using feedback control.
+     */
+    public void fieldOrientedDrive(ChassisSpeeds desiredChassisSpeeds) {
+        Rotation2d currentOrientation = odometry.getPoseMeters().getRotation();
+
+        ChassisSpeeds currentSpeeds = getFieldOrientedVelocity();
 
         // Limit x acceleration and deceleration
         double minX = currentSpeeds.vxMetersPerSecond - arbitraryAcelLimitPerLoop;
@@ -112,21 +128,7 @@ public class Drivetrain extends SubsystemBase {
         ChassisSpeeds limitedSpeeds = new ChassisSpeeds(limitedVx, 
             limitedVy, desiredChassisSpeeds.omegaRadiansPerSecond);
 
-        SwerveModuleState[] swerveModuleStates = DrivetrainConstants.swerveKinematics.toSwerveModuleStates(limitedSpeeds);
-
-        setModuleStates(swerveModuleStates);
-    }
-
-    /**
-     * Drives the robot at a desired chassis speeds. The coordinate system
-     * is the same as the one as the one for setPoseMeters().
-     * 
-     * @param desiredChassisSpeeds - Field relative chassis speeds, in m/s and rad/s. 
-     * @param closedLoop - Whether or not to drive the drive wheels with using feedback control.
-     */
-    public void fieldOrientedDrive(ChassisSpeeds desiredChassisSpeeds) {
-        Rotation2d currentOrientation = odometry.getPoseMeters().getRotation();
-        ChassisSpeeds robotOrientedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(desiredChassisSpeeds, currentOrientation);
+        ChassisSpeeds robotOrientedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(limitedSpeeds, currentOrientation);
         this.robotOrientedDrive(robotOrientedSpeeds);
     }
 
