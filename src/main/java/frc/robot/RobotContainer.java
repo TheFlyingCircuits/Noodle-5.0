@@ -140,7 +140,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    duncanController.rightTrigger().onTrue(new ShootIntoHubCommand(drivetrain, shooter));
+    // duncanController.rightTrigger().onTrue(new ShootIntoHubCommand(drivetrain, shooter));
   }
 
   public void setDefaultCommands() {

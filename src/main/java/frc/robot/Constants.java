@@ -5,8 +5,6 @@
 package frc.robot;
 
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -256,6 +254,17 @@ public final class Constants {
             velocityMap.put(2.0, 20.0);
             angleMap.put(2.0, 65.0 );
         }
+    }
+
+    public final static class IntakeConstants {
+
+        public static final int pivotNeoID = 99999999;
+        public static final int rollerTopKrakenID = 999999;
+        public static final int rollerBottomKrakenID = 99999;
+        public static final double kP = 0.3;
+        public static final double kS = 0.7;
+
+        public static final double intakeStartDegrees = 9999999999999.0; 
     }
 
     public final static class VisionConstants {
