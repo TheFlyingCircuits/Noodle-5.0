@@ -265,6 +265,9 @@ public final class Constants {
         public static final double kS = 0.7;
 
         public static final double intakeStartDegrees = 9999999999999.0; 
+
+        // this is used for manually moving intake up and also used while shooting
+        public static final double intakeUpDegrees = 99999.0;
     }
 
     public final static class VisionConstants {

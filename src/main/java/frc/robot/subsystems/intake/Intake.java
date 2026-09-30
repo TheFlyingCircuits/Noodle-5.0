@@ -4,23 +4,19 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
     IntakeIOInputsAutoLogged inputs;
     IntakeIO io;
-    private Timer timer;
 
     boolean isIntakeDown = false;
 
     public Intake(IntakeIO io) {
         this.io = io;
         inputs = new IntakeIOInputsAutoLogged();
-        timer = new Timer();
-        timer.start();
-        
     }
 
     @Override
@@ -37,12 +33,6 @@ public class Intake extends SubsystemBase {
     public void intakeRunRollers() {
         io.setTargetRollerBottomVelocity(50.0);
         io.setTargetRollerTopVelocity(50.0);
-    }
-
-    public void inAutoIntake() {
-        intakeDefault();
-        io.setTargetRollerBottomVelocity(40.0);
-        io.setTargetRollerTopVelocity(40.0);
     }
 
     public void intakeRollersStop() {
@@ -67,22 +57,11 @@ public class Intake extends SubsystemBase {
         }
     }
 
-    public void intakeUpDown() {
-        if(timer.get() > 0.3) timer.reset();
-
-        intakeRunRollers();
-        if((timer.get() < 0.15) ) {
-            io.setIntakeVolts(2.0);
-        } else if(timer.get() < 0.3) {
-            io.setIntakeVolts(-1.5);
-        }
-    }
-
     public void intakeDownThenIntake() {
         if(inputs.intakePositionDegrees > 15.0) {
             isIntakeDown = false;
             // io.setTargetIntakePositionDegrees(0);
-            io.setIntakeVolts(-7.0);
+            io.setIntakeVolts(-4.0);
             // reverseIntake();
         } else {
             isIntakeDown = true;
@@ -99,7 +78,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeUp() {
-        io.setTargetIntakePositionDegrees(45);
+        io.setTargetIntakePositionDegrees(IntakeConstants.intakeUpDegrees);
     }
 
     public void intakeDefault() {
@@ -119,10 +98,6 @@ public class Intake extends SubsystemBase {
 
     public Command noVoltageCommand() {
         return this.run(() -> rollerAndIntakeNoVolts());
-    }
-
-    public Command inAutoIntakeCommand() {
-        return this.run(() -> inAutoIntake());
     }
 
     public Command intakeDownCommand() {
