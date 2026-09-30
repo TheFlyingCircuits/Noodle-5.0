@@ -46,8 +46,12 @@ import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIOMapleSim;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIONeo;
 import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOMotors;
+import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIOKraken;
+import frc.robot.subsystems.shooter.ShooterIOSim;
 
 public class RobotContainer {
 
@@ -57,6 +61,7 @@ public class RobotContainer {
 
     public Indexer indexer;
     public Shooter shooter;
+    public Intake intake;
 
     Timer pathTimer;
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
@@ -76,15 +81,10 @@ public class RobotContainer {
         );
         indexer = new Indexer(new IndexerIONeo());
         shooter = new Shooter(new ShooterIOKraken());
+        intake = new Intake(new IntakeIOMotors());
 
     } else {
-        // drivetrain = new Drivetrain(
-        //     new GyroIOSim(){},
-        //     new SwerveModuleIOSim(){},
-        //     new SwerveModuleIOSim(){},
-        //     new SwerveModuleIOSim(){},
-        //     new SwerveModuleIOSim(){}
-        // );
+
       DriveTrainSimulationConfig driveSimulationConfig = DriveTrainSimulationConfig.Default()
         // Specify gyro type (for realistic gyro drifting and error simulation)
         .withGyro(COTS.ofPigeon2())
@@ -129,6 +129,8 @@ public class RobotContainer {
         drivetrain.odometry.setPoseMeters(new Pose2d(3, 3, new Rotation2d()));
 
         indexer = new Indexer(new IndexerIOSim());
+        shooter = new Shooter(new ShooterIOSim());
+        intake = new Intake(new IntakeIOSim(drivetrain));
 
         SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
         pathTimer = new Timer();
@@ -140,7 +142,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // duncanController.rightTrigger().onTrue(new ShootIntoHubCommand(drivetrain, shooter));
+    duncanController.rightBumper().whileTrue(new ShootIntoHubCommand(drivetrain, shooter));
   }
 
   public void setDefaultCommands() {
