@@ -21,7 +21,13 @@ public class ShootIntoHubCommand extends Command {
         this.drivetrain = drivetrain;
         this.shooter = shooter;
 
-        addRequirements(drivetrain,shooter);
+        addRequirements(drivetrain, shooter);
+    }
+
+    @Override
+    public void initialize() {
+        drivetrain.odometry.allowTeleportsNextPoseUpdate();
+        drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
     }
 
     @Override

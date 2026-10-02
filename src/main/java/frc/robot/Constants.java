@@ -41,6 +41,9 @@ public final class Constants {
 
         public static final double bumperWidthMeters = Units.inchesToMeters(27 + 7);
 
+        public static final double drivetrainShotToleranceDeg = 2.0;
+        public static final double shooterShotRPMTolerance = 50.0;
+        public static final double shooterShotTolgeranceDeg = 2.0;
     }
 
     public final static class ControllerConstants {
@@ -254,6 +257,9 @@ public final class Constants {
             velocityMap.put(2.0, 20.0);
             angleMap.put(2.0, 65.0 );
         }
+
+        // TODO: get real diameter this was a rough estimate
+        public static final double drumDiameterMeters = Units.inchesToMeters(4.5);
     }
 
     public final static class IntakeConstants {
@@ -267,7 +273,7 @@ public final class Constants {
         public static final double intakeStartDegrees = 9999999999999.0; 
 
         // this is used for manually moving intake up and also used while shooting
-        public static final double intakeUpDegrees = 99999.0;
+        public static final double intakeUpDegrees = 90.0;
     }
 
     public final static class VisionConstants {

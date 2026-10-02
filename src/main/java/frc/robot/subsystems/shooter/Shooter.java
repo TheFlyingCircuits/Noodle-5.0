@@ -18,20 +18,36 @@ public class Shooter extends SubsystemBase {
         this.io = io;
     }
 
+    /**
+     * This record is used to store the error for the shooter components.
+     * @param velocityErrorRPM The error of the drum shooter velocity in RPM from target-current.
+     * @param angleErrorDeg The error of the pivot in degrees from target-current.
+     */
+    public record ShooterError(double velocityErrorRPM, double angleErrorDeg) {};
+
     @Override
     public void periodic() {
         io.updateInputs(inputs);
     }
 
-    public void setShot(double velocity, double position) {
-       
+    /**
+     * This function is used for setting the target velocity and position for the shooter subsystem.
+     * @param velocityRPM Target velocity for the drum shooter and hood shooter in RPS.
+     * @param positionDeg Target angle for our pivot/hood in degrees.
+     * @return A ShooterError record that has the velocity error in RPS and the angle error in degrees.
+     */
+    public ShooterError setShot(double velocityRPM, double positionDeg) {
+        io.setShooterVelocity(velocityRPM);
+        io.setPivotAngle(positionDeg);  
 
-        io.setShooterVelocity(velocity);
-        io.setPivotAngle(position);    
+        double errorRPM = velocityRPM - inputs.shooterVelocityRPM;
+        double errorDeg = positionDeg - inputs.pivotAngleDegrees;
+        
+        return new ShooterError(errorRPM, errorDeg);
     }
 
     public double getCurrentShooterRPM() {
-        return inputs.shooterVelocity;
+        return inputs.shooterVelocityRPM;
     }
 
     public double getCurrentPivotAngleDegrees() {

@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.PassCommand;
 import frc.robot.Commands.ShootIntoHubCommand;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldElement;
@@ -142,6 +143,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    duncanController.leftBumper().whileTrue(new PassCommand(drivetrain, shooter, indexer, intake));
     duncanController.rightBumper().whileTrue(new ShootIntoHubCommand(drivetrain, shooter));
   }
 

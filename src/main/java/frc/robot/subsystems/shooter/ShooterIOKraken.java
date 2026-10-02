@@ -98,7 +98,8 @@ public class ShooterIOKraken implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        inputs.shooterVelocity = shooterTL.getVelocity().getValueAsDouble() * 60.0;
+        // convert the krakens defualt RPS output to RPM by multiplying by 60 sec
+        inputs.shooterVelocityRPM = shooterTL.getVelocity().getValueAsDouble() * 60.0;
 
 
         inputs.shooterVolts = shooterTL.getMotorVoltage().getValueAsDouble();

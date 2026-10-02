@@ -42,13 +42,17 @@ public class Indexer extends SubsystemBase {
      *
      * @param targetRPM The desired RPM of the indexer motors
      */
-    private void setIndexerVelocity(double targetRPM) {
+    public void setIndexerVelocity(double targetRPM) {
         double measuredRPM = inputs.indexerFLVelocity;
         double feedforwardVolts = velocityFeedforward.calculate(targetRPM);
         double feedbackVolts = velocityPID.calculate(measuredRPM, targetRPM);
 
         double outputVolts = MathUtil.clamp(feedforwardVolts + feedbackVolts, -8.0, 8.0);
         io.setIndexerVolts(outputVolts);
+    }
+
+    public void stopIndexing() {
+        io.setIndexerVolts(0.0);
     }
 
     /**
@@ -61,8 +65,6 @@ public class Indexer extends SubsystemBase {
         return this.run(
             () -> setIndexerVelocity(targetRPM));
     }
-
-    
 
     /**
      * default indexer command that periodically checks if the can range sensor is within tolerance and if so our hopper is full enougth to fill our feeder with fuel.

@@ -7,7 +7,6 @@ import org.photonvision.simulation.VisionTargetSim;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,10 +33,7 @@ public class Drivetrain extends SubsystemBase {
 
     private final PIDController xController = new PIDController(5.5, 0.1, 0.0);
     private final PIDController yController = new PIDController(5.5, 0.1, 0.0);
-    private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
-
-    // 12 m/s^2 and the 0.02 is the loops time of 20 ms
-    double arbitraryAcelLimitPerLoop = 70.0 * 0.02;
+    private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -113,22 +109,7 @@ public class Drivetrain extends SubsystemBase {
     public void fieldOrientedDrive(ChassisSpeeds desiredChassisSpeeds) {
         Rotation2d currentOrientation = odometry.getPoseMeters().getRotation();
 
-        ChassisSpeeds currentSpeeds = getFieldOrientedVelocity();
-
-        // Limit x acceleration and deceleration
-        double minX = currentSpeeds.vxMetersPerSecond - arbitraryAcelLimitPerLoop;
-        double maxX = currentSpeeds.vxMetersPerSecond + arbitraryAcelLimitPerLoop;
-        double limitedVx = MathUtil.clamp(desiredChassisSpeeds.vxMetersPerSecond, minX, maxX);
-
-        // Limit yacceleration and deceleration
-        double minY = currentSpeeds.vyMetersPerSecond - arbitraryAcelLimitPerLoop;
-        double maxY = currentSpeeds.vyMetersPerSecond + arbitraryAcelLimitPerLoop;
-        double limitedVy = MathUtil.clamp(desiredChassisSpeeds.vyMetersPerSecond, minY, maxY);
-        // gets now the limited speeds and uses hypot*cos(angle theta) = adjecent
-        ChassisSpeeds limitedSpeeds = new ChassisSpeeds(limitedVx, 
-            limitedVy, desiredChassisSpeeds.omegaRadiansPerSecond);
-
-        ChassisSpeeds robotOrientedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(limitedSpeeds, currentOrientation);
+        ChassisSpeeds robotOrientedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(desiredChassisSpeeds, currentOrientation);
         this.robotOrientedDrive(robotOrientedSpeeds);
     }
 
@@ -147,6 +128,51 @@ public class Drivetrain extends SubsystemBase {
         return s;
     }
 
+    // functions relating to shooting
+
+    /**
+     * This function makes the swerve go in the X pattern and is used when we don't want the robot to be pushed around
+     */
+    public void swerveXPattern() {
+        SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(135));
+        SwerveModuleState state2 = new SwerveModuleState(0.0, Rotation2d.fromDegrees(45));
+        SwerveModuleState[] states = {state2,state,state,state2};
+        setModuleStates(states);
+    }
+
+    /**
+     * This function aims the robot chassis at a specified translation with PID while the robots x and y doesn't move.
+     * 
+     * @param target A traslation2d of the thing that we want the robot chassis to aim at.
+     * @param shouldAimBackwards If true the robot will aim with the back leading instead of the front.
+     * @return returns the error in radians, this can be used for checking if within tolerance.
+     */
+    public double aimAtTranslation(Translation2d target, boolean shouldAimBackwards) {
+        // gets robot pose and then subtracts the robot pose vector from target to make the translation
+        // vector robot relative instead of field relative
+        Pose2d robotPose = odometry.getPoseMeters();
+        Translation2d robotToTargetVector = target.minus(robotPose.getTranslation());
+
+        // gets the angle component of the vector going from the robot to the hub through the inverse tangent
+        // of the x and y components of the hypotinuse 
+        double desiredAngleToTargetRad = Math.atan2(robotToTargetVector.getY(), robotToTargetVector.getX());
+
+        // if should aim with back of robot then rotate target angle by 180 deg
+        if(shouldAimBackwards) {
+            desiredAngleToTargetRad = Rotation2d.fromRadians(desiredAngleToTargetRad).rotateBy(Rotation2d.k180deg).getRadians();
+        }
+
+        // gets error by subtracting both angles with the Rotation2d class
+        double errorRad = robotPose.getRotation().minus(Rotation2d.fromRadians(desiredAngleToTargetRad)).getRadians();
+
+        // sets xy velcocity to 0 and uses the heading PID controller to calculate output voltage from our error
+        fieldOrientedDrive(new ChassisSpeeds(0, 0, 
+            headingController.calculate(errorRad)));
+
+        // after the aiming is done we return our error in radians
+        return errorRad;
+    }
+    
     // path following
     public void followTrajectory(Trajectory<SwerveSample> trajectory, Timer timer, boolean isRedAlliance) {
         SwerveSample finalSample= trajectory.getFinalSample(isRedAlliance).get();

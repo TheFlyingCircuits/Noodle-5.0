@@ -26,7 +26,8 @@ public class ShooterIOSim implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        inputs.shooterVelocity = simShooterRPM;
+        // System.out.println(simShooterRPM);
+        inputs.shooterVelocityRPM = simShooterRPM;
 
 
         // inputs.shooterVolts = shooterTL.getMotorVoltage().getValueAsDouble();
