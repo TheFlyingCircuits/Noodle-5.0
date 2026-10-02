@@ -34,6 +34,7 @@ public class Drivetrain extends SubsystemBase {
     private final PIDController xController = new PIDController(5.5, 0.1, 0.0);
     private final PIDController yController = new PIDController(5.5, 0.1, 0.0);
     private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
+    private final PIDController headingControllerAiming = new PIDController(8.0, 0.0, 0.0);
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -167,7 +168,7 @@ public class Drivetrain extends SubsystemBase {
 
         // sets xy velcocity to 0 and uses the heading PID controller to calculate output voltage from our error
         fieldOrientedDrive(new ChassisSpeeds(0, 0, 
-            headingController.calculate(errorRad)));
+            headingControllerAiming.calculate(errorRad)));
 
         // after the aiming is done we return our error in radians
         return errorRad;
