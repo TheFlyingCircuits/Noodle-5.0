@@ -12,8 +12,6 @@ public class Shooter extends SubsystemBase {
     private final ShooterIO io;
     private final ShooterIOInputs inputs = new ShooterIOInputs();
 
-    // used to eliminate teleportation affeting lookup table
-
     public Shooter(ShooterIO io) {
         this.io = io;
     }
