@@ -144,7 +144,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     duncanController.leftBumper().whileTrue(new PassCommand(drivetrain, shooter, indexer, intake));
-    duncanController.rightBumper().whileTrue(new ShootIntoHubCommand(drivetrain, shooter));
+    duncanController.rightBumper().whileTrue(new ShootIntoHubCommand(drivetrain, shooter,indexer,intake));
   }
 
   public void setDefaultCommands() {
