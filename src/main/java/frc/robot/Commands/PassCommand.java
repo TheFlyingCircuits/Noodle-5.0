@@ -57,10 +57,10 @@ public class PassCommand extends Command {
     public PassCommand(Drivetrain drivetrain, Shooter shooter, Indexer indexer, Intake intake) {
         this.drivetrain = drivetrain;
         this.shooter = shooter;
-        this.indexer=indexer;
-        this.intake=intake;
+        this.indexer = indexer;
+        this.intake = intake;
 
-        addRequirements(drivetrain,shooter);
+        addRequirements(drivetrain, shooter, indexer, intake);
     }
 
     @Override 
