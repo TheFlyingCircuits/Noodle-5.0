@@ -25,7 +25,7 @@ import frc.robot.PlayingField.FieldElement;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOInputsAutoLogged;
-import frc.robot.subsystems.vision.SingleTagCam;
+import frc.robot.subsystems.vision.Limelights;
 import frc.robot.subsystems.vision.SingleTagPoseObservation;
 
 public class Odometry {
@@ -34,14 +34,12 @@ public class Odometry {
 
     public GyroIO gyroIO;
     public GyroIOInputsAutoLogged gyroInputs;
-
-    private SingleTagCam[] tagCams = {
-        new SingleTagCam(VisionConstants.tagCameraNames[0], VisionConstants.tagCameraTransforms[0]), // front
-    };
+    Limelights limelights;
 
     private boolean fullyTrustVisionNextPoseUpdate = false;
     private boolean allowTeleportsNextPoseUpdate = false;
     private boolean hasAcceptablePoseObservationsThisLoop = false;
+    private boolean hasSeenGoodTag = false;
     private Optional<FieldElement> focus = Optional.empty();
 
     
@@ -55,6 +53,11 @@ public class Odometry {
         gyroInputs = new GyroIOInputsAutoLogged();
 
         gyroIO.setRobotYaw(0);
+
+        ArrayList<String> camNames = new ArrayList<String>();
+        camNames.add(0,"limelight-front");
+        limelights = new Limelights(camNames);
+        limelights.setIMUModeNow(1);
 
         // corresponds to x, y, and rotation standard deviations (meters and radians)
         // TODO: could use this experiment as a way to measure these, or we could just
@@ -171,9 +174,8 @@ public class Odometry {
 
         // get all pose observations from each camera
         List<SingleTagPoseObservation> allFreshPoseObservations = new ArrayList<>();
-        for (SingleTagCam tagCam : tagCams) {
-            allFreshPoseObservations.addAll(tagCam.getFreshPoseObservations(false, getPoseMeters().getRotation().getDegrees()));
-        }
+
+        allFreshPoseObservations.addAll(limelights.getFreshPoseObservations(hasSeenGoodTag, drivetrain));
 
         // process pose obvervations in chronological order
         allFreshPoseObservations.sort(new Comparator<SingleTagPoseObservation>() {
@@ -190,9 +192,13 @@ public class Odometry {
             Translation2d observedLocation = poseObservation.robotPose().getTranslation().toTranslation2d();
             Translation2d locationNow = getPoseMeters().getTranslation();
 
+            double tagToCamMeters = poseObservation.tagToCamMeters();
+            double poseAmbiguity = poseObservation.ambiguity();
+
             // reject tags that are too far away
-            if (poseObservation.tagToCamMeters() > 6.0) {
+            if (tagToCamMeters > 6.0) {
                 rejectedTags.add(poseObservation.getTagPose());
+                Logger.recordOutput("Odometry/distance meters", poseObservation.tagToCamMeters());
                 continue;
             }
 
@@ -200,34 +206,53 @@ public class Odometry {
             // is in the air or beneath the floor
             if (Math.abs(poseObservation.robotPose().getZ()) > Units.inchesToMeters(7)) {
                 rejectedTags.add(poseObservation.getTagPose());
+                Logger.recordOutput("Odometry/height", Math.abs(poseObservation.robotPose().getZ()));
                 continue;
             }
+
+            // Logger.recordOutput("Odometry/Pose ambiguity", poseObservation.ambiguity());
 
             // reject tags that are too ambiguous
-            if (poseObservation.ambiguity() > 0.25) {
+            if (poseAmbiguity > 0.7) {
+                Logger.recordOutput("Odometry/Pose ambiguity", poseObservation.ambiguity());
                 rejectedTags.add(poseObservation.getTagPose());
                 continue;
             }
 
-            // Don't allow the robot to teleport. Disallowing teleports can cause problems when we get bumped
-            // and experience lots of wheel slip, which is why we have the "allowTeleportsNextPoseUpdate" flag
-            // (used at driver's discretion (typically via y-button)). Also useful for seeding the robot pose
-            // at the beginning of a match.
-            double teleportToleranceMeters = 2.0;
-            if ((observedLocation.getDistance(locationNow) > teleportToleranceMeters) && (!this.allowTeleportsNextPoseUpdate)) {
-                rejectedTags.add(poseObservation.getTagPose());
-                continue;
+             Matrix<N3, N1> stdDevs;
+
+            // if we have seen a good enough tag then start using mt2
+            if(!(hasSeenGoodTag) && (tagToCamMeters < 4.5) && (poseAmbiguity < 0.26)) {
+                hasSeenGoodTag = true;
+                Logger.recordOutput("Odometry/hasSeenGoodTag", hasSeenGoodTag);
+                limelights.setIMUModeNextLoop(3);
+                this.fullyTrustVisionNextPoseUpdate = false;
+                this.allowTeleportsNextPoseUpdate = false;
+                stdDevs = VecBuilder.fill(0, 0, 0);
+            } else {
+                // Don't allow the robot to teleport. Disallowing teleports can cause problems when we get bumped
+                // and experience lots of wheel slip, which is why we have the "allowTeleportsNextPoseUpdate" flag
+                // (used at driver's discretion (typically via y-button)). Also useful for seeding the robot pose
+                // at the beginning of a match.
+                double teleportToleranceMeters = 2.0;
+                if ((observedLocation.getDistance(locationNow) > teleportToleranceMeters) && (!this.allowTeleportsNextPoseUpdate)) {
+                    rejectedTags.add(poseObservation.getTagPose());
+                    continue;
+                }
+
+                // Don't use tags that are irrelevant to our current goal (e.g. only use hub tags when shooting).
+                // if ((focus.isPresent() && !focus.get().hasTagID(poseObservation.tagUsed()))) {
+                //     rejectedTags.add(poseObservation.getTagPose());
+                //     continue;
+                // }
+
+                // This measurment passes all our checks, so we add it to the fusedPoseEstimator
+                acceptedTags.add(poseObservation.getTagPose());
+                stdDevs = this.fullyTrustVisionNextPoseUpdate ? VecBuilder.fill(0, 0, 0) : poseObservation.getStandardDeviations((focus.isPresent() && focus.get() == FieldElement.HUB));
             }
 
-            // Don't use tags that are irrelevant to our current goal (e.g. only use hub tags when shooting).
-            if ((focus.isPresent() && !focus.get().hasTagID(poseObservation.tagUsed()))) {
-                rejectedTags.add(poseObservation.getTagPose());
-                continue;
-            }
-
-            // This measurment passes all our checks, so we add it to the fusedPoseEstimator
             acceptedTags.add(poseObservation.getTagPose());
-            Matrix<N3, N1> stdDevs = this.fullyTrustVisionNextPoseUpdate ? VecBuilder.fill(0, 0, 0) : poseObservation.getStandardDeviations((focus.isPresent() && focus.get() == FieldElement.HUB));
+
 
             fusedPoseEstimator.addVisionMeasurement(
                 poseObservation.robotPose().toPose2d(), 
@@ -246,11 +271,5 @@ public class Odometry {
         Logger.recordOutput("drivetrain/rejectedTags", rejectedTags.toArray(new Pose3d[0]));
         
         allFreshPoseObservations = null;
-    }
-
-
-    public Optional<Translation3d> getClosestCluster() {
-        return null;
-        // return intakeCam.getClosestClusterTo(getPoseMeters().getTranslation());
     }
 }
