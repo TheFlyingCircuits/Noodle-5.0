@@ -20,10 +20,10 @@ public class Shooter extends SubsystemBase {
 
     /**
      * This record is used to store the error for the shooter components.
-     * @param velocityErrorRPM The error of the drum shooter velocity in RPM from target-current.
+     * @param velocityErrorRPS The error of the drum shooter velocity in RPS from target-current.
      * @param angleErrorDeg The error of the pivot in degrees from target-current.
      */
-    public record ShooterError(double velocityErrorRPM, double angleErrorDeg) {};
+    public record ShooterError(double velocityErrorRPS, double angleErrorDeg) {};
 
     @Override
     public void periodic() {
@@ -32,22 +32,22 @@ public class Shooter extends SubsystemBase {
 
     /**
      * This function is used for setting the target velocity and position for the shooter subsystem.
-     * @param velocityRPM Target velocity for the drum shooter and hood shooter in RPS.
+     * @param velocityRPS Target velocity for the drum shooter and hood shooter in RPS.
      * @param positionDeg Target angle for our pivot/hood in degrees.
      * @return A ShooterError record that has the velocity error in RPS and the angle error in degrees.
      */
-    public ShooterError setShot(double velocityRPM, double positionDeg) {
-        io.setShooterVelocity(velocityRPM);
+    public ShooterError setShot(double velocityRPS, double positionDeg) {
+        io.setShooterVelocity(velocityRPS);
         io.setPivotAngle(positionDeg);  
 
-        double errorRPM = velocityRPM - inputs.shooterVelocityRPM;
+        double errorRPS = velocityRPS - inputs.shooterVelocityRPS;
         double errorDeg = positionDeg - inputs.pivotAngleDegrees;
         
-        return new ShooterError(errorRPM, errorDeg);
+        return new ShooterError(errorRPS, errorDeg);
     }
 
-    public double getCurrentShooterRPM() {
-        return inputs.shooterVelocityRPM;
+    public double getCurrentShooterRPS() {
+        return inputs.shooterVelocityRPS;
     }
 
     public double getCurrentPivotAngleDegrees() {
@@ -66,8 +66,8 @@ public class Shooter extends SubsystemBase {
         return this.run(() -> io.setPivotVolts(volts));
     }
 
-    public Command setShooterVelocityCommand(double targetRPM) {
-        return this.run(() -> io.setShooterVelocity(targetRPM));
+    public Command setShooterVelocityCommand(double targetRPS) {
+        return this.run(() -> io.setShooterVelocity(targetRPS));
     }
 
     public Command setPivotAngleCommand(double targetDegrees) {

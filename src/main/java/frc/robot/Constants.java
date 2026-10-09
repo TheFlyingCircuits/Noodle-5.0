@@ -42,7 +42,7 @@ public final class Constants {
         public static final double bumperWidthMeters = Units.inchesToMeters(27 + 7);
 
         public static final double drivetrainShotToleranceDeg = 2.0;
-        public static final double shooterShotRPMTolerance = 50.0;
+        public static final double shooterShotRPSTolerance = 2.0;
         public static final double shooterShotTolgeranceDeg = 2.0;
     }
 
@@ -206,14 +206,16 @@ public final class Constants {
         public static final int indexerRangeId = 4;
         public static final double indexerRangeThresholdMeters = 0.1;
 
-        public static final double velocityKpVoltsPerRPM = 0.002;
-        public static final double velocityKiVoltsPerRPMSecond = 0.0;
-        public static final double velocityKdVoltsPerRPMPerSecond = 0.0;
+        public static final double velocityKpVoltsPerRPS = 0.002;
+        public static final double velocityKiVoltsPerRPSSecond = 0.0;
+        public static final double velocityKdVoltsPerRPSPerSecond = 0.0;
 
         public static final double velocityKsVolts = 0.2;
-        public static final double velocityKvVoltsPerRPM = 12.0 / 5820.0;
+        public static final double velocityKvVoltsPerRPS = (12.0 / 5800.0) / 60.0;
         public static final double simVelocityTimeConstantSeconds = 0.1;
         public static final double indexerRangeDebounceSeconds = 0.1;
+
+        public static final double shootingIndexingVelocityRPS = 70.0;
 
     }
     

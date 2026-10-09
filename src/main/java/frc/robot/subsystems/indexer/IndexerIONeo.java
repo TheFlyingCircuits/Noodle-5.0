@@ -15,7 +15,6 @@ public class IndexerIONeo implements IndexerIO {
     private Neo indexerFR;
     private Neo indexerBL;
     private Neo indexerBR;
-    private CANrange indexerRange;
 
     private SparkMaxConfig indexerConfig;
     private SparkMaxConfig indexerFollowConfig;
@@ -25,9 +24,6 @@ public class IndexerIONeo implements IndexerIO {
         indexerFR = new Neo(Constants.IndexerConstants.indexerFRId);
         indexerBL = new Neo(Constants.IndexerConstants.indexerBLId);
         indexerBR = new Neo(Constants.IndexerConstants.indexerBRId);
-        indexerRange = new CANrange(
-            Constants.IndexerConstants.indexerRangeId,
-            Constants.UniversalConstants.canivoreName);
 
         configureMotors();
     }
@@ -38,15 +34,19 @@ public class IndexerIONeo implements IndexerIO {
         indexerConfig = new SparkMaxConfig();
         indexerConfig.idleMode(IdleMode.kBrake);
         indexerConfig.inverted(false); //TODO set real invertion
-        indexerConfig.encoder.positionConversionFactor(1); //TODO set real conversion factor
+        indexerConfig.encoder.velocityConversionFactor(1.0/60.0); // convert rpm to rps
         indexerFL.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // follow config
         indexerFollowConfig = indexerConfig;
         indexerFollowConfig.follow(Constants.IndexerConstants.indexerFLId);
 
-        indexerFR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         indexerBL.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // invert right side motors
+        indexerFollowConfig.inverted(true);
+        
+        indexerFR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         indexerBR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -58,22 +58,11 @@ public class IndexerIONeo implements IndexerIO {
 
     @Override
     public void updateInputs(IndexerIOInputs inputs) {
-        inputs.indexerFLVelocity = indexerFL.getVelocity();
-        inputs.indexerFRVelocity = indexerFR.getVelocity();
-        inputs.indexerBLVelocity = indexerBL.getVelocity();
-        inputs.indexerBRVelocity = indexerBR.getVelocity();
+        inputs.indexerVelocity = indexerFL.getVelocity();
 
-        inputs.indexerFLVolts = indexerFL.getAppliedOutput() * indexerFL.getBusVoltage();
-        inputs.indexerFRVolts = indexerFR.getAppliedOutput() * indexerFR.getBusVoltage();
-        inputs.indexerBLVolts = indexerBL.getAppliedOutput() * indexerBL.getBusVoltage();
-        inputs.indexerBRVolts = indexerBR.getAppliedOutput() * indexerBR.getBusVoltage();
+        inputs.indexerVolts = indexerFL.getAppliedOutput() * indexerFL.getBusVoltage();
 
-        inputs.indexerFLAmps = indexerFL.getOutputCurrent();
-        inputs.indexerFRAmps = indexerFR.getOutputCurrent();
-        inputs.indexerBLAmps = indexerBL.getOutputCurrent();
-        inputs.indexerBRAmps = indexerBR.getOutputCurrent();
-
-        inputs.indexerRangeDistanceMeters = indexerRange.getDistance().getValueAsDouble();
+        inputs.indexerAmps = indexerFL.getOutputCurrent();
     }
 
 }

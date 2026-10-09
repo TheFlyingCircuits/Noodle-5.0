@@ -6,10 +6,10 @@ import frc.robot.VendorWrappers.Neo;
 
 public class IndexerIOSim implements IndexerIO {
     private static final double MAX_VOLTAGE = 12.0;
-    private static final double FREE_SPEED_RPM = 5820.0;
+    private static final double FREE_SPEED_RPS = 5800.0 / 60.0;
 
     private double commandedVolts;
-    private double velocityRPM;
+    private double velocityRPS;
     private double rangeDistanceMeters = 1.0;
     private double lastUpdateTimestamp = Timer.getFPGATimestamp();
 
@@ -24,30 +24,19 @@ public class IndexerIOSim implements IndexerIO {
         double deltaTimeSeconds = Math.max(0.0, currentTimestamp - lastUpdateTimestamp);
         lastUpdateTimestamp = currentTimestamp;
 
-        double targetVelocityRPM = commandedVolts / MAX_VOLTAGE * FREE_SPEED_RPM;
-        double velocityChange = targetVelocityRPM - velocityRPM;
+        double targetVelocityRPS = commandedVolts / MAX_VOLTAGE * FREE_SPEED_RPS;
+        double velocityChange = targetVelocityRPS - velocityRPS;
         double responseFactor = 1.0 - Math.exp(-deltaTimeSeconds / Constants.IndexerConstants.simVelocityTimeConstantSeconds);
-        velocityRPM += velocityChange * responseFactor;
+        velocityRPS += velocityChange * responseFactor;
 
         double appliedVolts = commandedVolts;
         double currentAmps = Math.abs(appliedVolts) / MAX_VOLTAGE * Neo.freeCurrent;
 
-        inputs.indexerFLVelocity = velocityRPM;
-        inputs.indexerFRVelocity = velocityRPM;
-        inputs.indexerBLVelocity = velocityRPM;
-        inputs.indexerBRVelocity = velocityRPM;
+        inputs.indexerVelocity = velocityRPS;
 
-        inputs.indexerFLVolts = appliedVolts;
-        inputs.indexerFRVolts = appliedVolts;
-        inputs.indexerBLVolts = appliedVolts;
-        inputs.indexerBRVolts = appliedVolts;
+        inputs.indexerVolts = appliedVolts;
 
-        inputs.indexerFLAmps = currentAmps;
-        inputs.indexerFRAmps = currentAmps;
-        inputs.indexerBLAmps = currentAmps;
-        inputs.indexerBRAmps = currentAmps;
-
-        inputs.indexerRangeDistanceMeters = rangeDistanceMeters;
+        inputs.indexerAmps = currentAmps;
     }
 
     public void setRangeDistanceMeters(double distanceMeters) {

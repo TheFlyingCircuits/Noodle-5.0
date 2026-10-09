@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.UniversalConstants;
 import frc.robot.FlyingCircuitUtils;
@@ -99,14 +100,14 @@ public class PassCommand extends Command {
         }
 
         boolean drivetrainInTolerance = UniversalConstants.drivetrainShotToleranceDeg > Math.abs(driveErrorDeg);
-        boolean shotVelocityInTolerance = UniversalConstants.shooterShotRPMTolerance > Math.abs(shooterError.velocityErrorRPM());
+        boolean shotVelocityInTolerance = UniversalConstants.shooterShotRPSTolerance > Math.abs(shooterError.velocityErrorRPS());
         boolean shotAngleInTolerance = UniversalConstants.shooterShotTolgeranceDeg > Math.abs(shooterError.angleErrorDeg());
 
         // if not shooting check if everything is within tolerance and if so then change isShooing to true and start shooting
         if(!isShooting) isShooting = ((drivetrainInTolerance && shotVelocityInTolerance && shotAngleInTolerance));
 
         if(isShooting) {
-            indexer.setIndexerVelocity(2000.0);
+            indexer.setIndexerVelocity(IndexerConstants.shootingIndexingVelocityRPS);
             intake.intakeUpAndIntake();
         } else {
             indexer.stopIndexing();
@@ -115,7 +116,7 @@ public class PassCommand extends Command {
 
         // logs the errors
         Logger.recordOutput("Passing/Drivetrain errorDeg", driveErrorDeg);
-        Logger.recordOutput("Passing/Shooter velocityErrorRPM", shooterError.velocityErrorRPM());
+        Logger.recordOutput("Passing/Shooter velocityErrorRPS", shooterError.velocityErrorRPS());
         Logger.recordOutput("Passing/Shooter angleErrorDeg", shooterError.angleErrorDeg());
         Logger.recordOutput("Passing/isShooting", isShooting);
     }

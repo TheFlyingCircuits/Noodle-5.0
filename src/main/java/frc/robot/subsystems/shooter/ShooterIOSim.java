@@ -2,7 +2,7 @@ package frc.robot.subsystems.shooter;
 
 public class ShooterIOSim implements ShooterIO {
 
-    double simShooterRPM = 0.0;
+    double simShooterRPS = 0.0;
     double simPivotDegrees = 0.0;
 
 
@@ -12,8 +12,8 @@ public class ShooterIOSim implements ShooterIO {
     public void setShooterVolts(double volts) {}
 
     @Override
-    public void setShooterVelocity(double targetRPM) {
-        simShooterRPM = targetRPM;
+    public void setShooterVelocity(double targetRPS) {
+        simShooterRPS = targetRPS;
     }
 
     @Override
@@ -26,8 +26,8 @@ public class ShooterIOSim implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
-        // System.out.println(simShooterRPM);
-        inputs.shooterVelocityRPM = simShooterRPM;
+        // System.out.println(simShooterRPS);
+        inputs.shooterVelocityRPS = simShooterRPS;
 
 
         // inputs.shooterVolts = shooterTL.getMotorVoltage().getValueAsDouble();
