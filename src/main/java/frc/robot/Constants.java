@@ -199,10 +199,10 @@ public final class Constants {
     }
     
     public final static class IndexerConstants {
-        public static final int indexerFLId = 0;
+        public static final int indexerFLId = 3;
         public static final int indexerFRId = 1;
-        public static final int indexerBLId = 2;
-        public static final int indexerBRId = 3;
+        public static final int indexerBLId = 4;
+        public static final int indexerBRId = 2;
         public static final int indexerRangeId = 4;
         public static final double indexerRangeThresholdMeters = 0.1;
 
@@ -261,7 +261,7 @@ public final class Constants {
 
     public final static class IntakeConstants {
 
-        public static final int pivotNeoID = 99999999;
+        public static final int pivotNeoID = 5;
         public static final int rollerTopKrakenID = 999999;
         public static final int rollerBottomKrakenID = 99999;
         public static final double kP = 0.3;
