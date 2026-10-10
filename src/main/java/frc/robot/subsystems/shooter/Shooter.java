@@ -1,21 +1,19 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Translation2d;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.PlayingField.FieldConstants;
-import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
 public class Shooter extends SubsystemBase {
-    private final ShooterIO io;
-    private final ShooterIOInputs inputs = new ShooterIOInputs();
+    ShooterIO io;
+    ShooterIOInputsAutoLogged inputs;
 
     // used to eliminate teleportation affeting lookup table
 
     public Shooter(ShooterIO io) {
         this.io = io;
+        inputs = new ShooterIOInputsAutoLogged();
     }
 
     /**
@@ -28,6 +26,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("shooterInputs", inputs);
     }
 
     /**

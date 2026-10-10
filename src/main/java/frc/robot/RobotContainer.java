@@ -29,8 +29,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -68,6 +71,9 @@ public class RobotContainer {
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
 
     private SwerveDriveSimulation swerveDriveSimulation;
+
+    private final SendableChooser<String> autoChooser;
+    private String currentAuto = "none";
     
   public RobotContainer() {
     /**** INITIALIZE SUBSYSTEMS ****/
@@ -137,14 +143,20 @@ public class RobotContainer {
         pathTimer = new Timer();
     }
 
+    autoChooser = new SendableChooser<>();
+    autoChooser.addOption("Left_Trench_Auto", "Left");
+    autoChooser.addOption("Right_Trench_Auto", "Right");
+    
+    autoChooser.setDefaultOption("Left_Trench_Auto", "Left");
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
     duncanController = duncan.getXboxController();
     configureBindings();
     setDefaultCommands();
   }
 
   private void configureBindings() {
-    duncanController.leftBumper().whileTrue(new PassCommand(drivetrain, shooter, indexer, intake));
-    duncanController.rightBumper().whileTrue(new ShootIntoHubCommand(drivetrain, shooter,indexer,intake));
+    duncanController.rightBumper().whileTrue(autoPassOrShoot());
   }
 
   public void setDefaultCommands() {
@@ -158,6 +170,16 @@ public class RobotContainer {
     }).finallyDo(() -> {
         Logger.recordOutput("drivetrain/runningDefaultCommand", false);
     }).withName("driverFullyControlDrivetrain");
+  }
+
+  public boolean shouldShootIntoHub() {
+    boolean shouldTargetHub_blue = drivetrain.odometry.getPoseMeters().getTranslation().getX() < FieldElement.HUB.getLocation().getX();
+    boolean shouldTargetHub_red = !shouldTargetHub_blue;
+    return FlyingCircuitUtils.getAllianceDependentValue(shouldTargetHub_red, shouldTargetHub_blue, true);
+  }
+
+  public Command autoPassOrShoot() {
+    return new ConditionalCommand(new ShootIntoHubCommand(drivetrain, shooter,indexer,intake), new PassCommand(drivetrain, shooter, indexer, intake), () -> shouldShootIntoHub());
   }
 
   public boolean isOnRightSideField() {
@@ -209,8 +231,37 @@ public class RobotContainer {
     );
   }
 
+  /**
+   * This method only sets the pose when first called and when the auto choser is changed to a different auto
+   * so the vision can reseed the pose so that this method wont overide it each loop.
+   */
+  public void setPoseToAutoStart() {
+    if(!(currentAuto.equals(autoChooser.getSelected()))) {
+      Optional<Trajectory<SwerveSample>> optionalTrajectory = Choreo.loadTrajectory("Example_auto_1");
+      // if(optionalTrajectory.isEmpty()) return;
+
+      // gets alliance value and sees if mirrors path so robot follows correct path
+      final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+
+      boolean shouldMirror = !isOnRightSideField();
+      Trajectory<SwerveSample> trajectory = shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
+      Pose2d targetPose = trajectory.sampleAt(0, isRedAlliance).get().getPose();
+
+      drivetrain.odometry.setPoseMeters(targetPose);
+      if(RobotBase.isSimulation()) {
+        swerveDriveSimulation.setSimulationWorldPose(targetPose);;
+      }
+
+      Pose2d currentPose = drivetrain.odometry.getPoseMeters();
+      if(targetPose.equals(currentPose)){
+        currentAuto = autoChooser.getSelected();
+      }
+    }
+  }
+
   /** Called by Robot.java, convenience function for logging. */
   public void periodic() {
+    if(DriverStation.isDisabled()) setPoseToAutoStart();
     // if in sim set fused pose to maple sim pose and log it
     if(RobotBase.isSimulation()) {
       drivetrain.odometry.setPoseMeters(swerveDriveSimulation.getSimulatedDriveTrainPose());
@@ -227,11 +278,9 @@ public class RobotContainer {
     // need to replace Commands.wait with shooting and add intake and stuff
     return new SequentialCommandGroup(
       followChoreoCheckpointTrajoectory("Example_auto_1", 0.3, 0.1),
-      Commands.waitSeconds(1),
-      Commands.print("first path done!"),
+      autoPassOrShoot().withTimeout(3.5),
       followChoreoCheckpointTrajoectory("Example_auto_p2", 0.3, 0.1),
-      Commands.print("second path done!"),
-      Commands.waitSeconds(1)
+      autoPassOrShoot()
     );
   }
 

@@ -1,16 +1,17 @@
 package frc.robot.subsystems.indexer;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.indexer.IndexerIO.IndexerIOInputs;
 
 public class Indexer extends SubsystemBase {
     private final IndexerIO io;
-    private final IndexerIOInputs inputs = new IndexerIOInputs();
+    private final IndexerIOInputsAutoLogged inputs;
 
     private final PIDController velocityPID = new PIDController(
     Constants.IndexerConstants.velocityKpVoltsPerRPS,
@@ -24,12 +25,14 @@ public class Indexer extends SubsystemBase {
 
     public Indexer(IndexerIO io) {
         this.io = io;
+        inputs = new IndexerIOInputsAutoLogged();
     }
 
     // gets periodically called every 20 ms
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("indexerInputs", inputs);
     }
 
     public Command setIndexerVolts(double volts) {
