@@ -1,8 +1,14 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Amp;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -25,17 +31,17 @@ public class ShooterIOKraken implements ShooterIO {
     private TalonFXConfiguration pivotConfig;
 
     public ShooterIOKraken() {
-
         drumConfig = new TalonFXConfiguration();
         pivotConfig = new TalonFXConfiguration();
+
         shooterTL = new Kraken("Shooter TL", Constants.ShooterConstants.shooterTLId, Constants.UniversalConstants.canivoreName);
         shooterTR = new Kraken("Shooter TR", Constants.ShooterConstants.shooterTRId, Constants.UniversalConstants.canivoreName);
         shooterBL = new Kraken("Shooter BL", Constants.ShooterConstants.shooterBLId, Constants.UniversalConstants.canivoreName);
         shooterBR = new Kraken("Shooter BR", Constants.ShooterConstants.shooterBRId, Constants.UniversalConstants.canivoreName);
         pivot = new Kraken("Shooter Pivot", Constants.ShooterConstants.pivotId, Constants.UniversalConstants.canivoreName);
+
         configureDrumMotors();
         configurePivotMotor();
-
     }
 
     private void configureDrumMotors() {
@@ -82,8 +88,13 @@ public class ShooterIOKraken implements ShooterIO {
     }
 
     @Override
+    public void setShooterCurrent(double amps) {
+        shooterTL.setControl(new TorqueCurrentFOC(Amps.of(amps)));
+    }
+
+    @Override
     public void setShooterVelocity(double shooterVelocityRPS) {
-        shooterTL.setControl(new VelocityVoltage(shooterVelocityRPS));
+        shooterTL.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
     }
 
     @Override

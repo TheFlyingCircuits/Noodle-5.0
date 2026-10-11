@@ -46,11 +46,10 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeDown() {
-        // reverseIntake();
+        intakeRollersStop();
         if(inputs.intakePositionDegrees > 15.0) {
             isIntakeDown = false;
-            io.setIntakeVolts(-8.0);
-            // io.setTargetIntakePositionDegrees(0); 
+            io.setTargetIntakePositionDegrees(0); 
         } else {
             isIntakeDown = true;
             intakeDefault();
@@ -60,8 +59,7 @@ public class Intake extends SubsystemBase {
     public void intakeDownThenIntake() {
         if(inputs.intakePositionDegrees > 15.0) {
             isIntakeDown = false;
-            // io.setTargetIntakePositionDegrees(0);
-            io.setIntakeVolts(-4.0);
+            io.setTargetIntakePositionDegrees(0);
             // reverseIntake();
         } else {
             isIntakeDown = true;

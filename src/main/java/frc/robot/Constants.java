@@ -190,30 +190,27 @@ public final class Constants {
 
 
     public final static class GyroConstants {
-        public static final int pigeonID = 50;
+        public static final int pigeonID = 999;
 
         //Follow the mount calibration process in Phoenix Tuner to determine these
-        public static final double mountPoseYawDegrees = -90.45111083984375;
-        public static final double mountPosePitchDegrees = -16.21670913696289;
-        public static final double mountPoseRollDegrees = 89.97844696044922;
+        public static final double mountPoseYawDegrees = 0.0;
+        public static final double mountPosePitchDegrees = 0.0;
+        public static final double mountPoseRollDegrees = 0.0;
     }
     
     public final static class IndexerConstants {
-        public static final int indexerFLId = 3;
-        public static final int indexerFRId = 1;
-        public static final int indexerBLId = 4;
-        public static final int indexerBRId = 2;
-        public static final int indexerRangeId = 4;
-        public static final double indexerRangeThresholdMeters = 0.1;
+        public static final int indexerFLId = 999;
+        public static final int indexerFRId = 999;
+        public static final int indexerBLId = 999;
+        public static final int indexerBRId = 999;
 
-        public static final double velocityKpVoltsPerRPS = 0.002;
+        public static final double velocityKpVoltsPerRPS = 0.05;
         public static final double velocityKiVoltsPerRPSSecond = 0.0;
         public static final double velocityKdVoltsPerRPSPerSecond = 0.0;
 
         public static final double velocityKsVolts = 0.2;
         public static final double velocityKvVoltsPerRPS = (12.0 / 5800.0) / 60.0;
         public static final double simVelocityTimeConstantSeconds = 0.1;
-        public static final double indexerRangeDebounceSeconds = 0.1;
 
         public static final double shootingIndexingVelocityRPS = 70.0;
 
@@ -222,15 +219,15 @@ public final class Constants {
     public final static class ShooterConstants {
 
         // motor id
-        public static final int shooterTLId = 5;
-        public static final int shooterTRId = 6;
-        public static final int shooterBLId = 7;
-        public static final int shooterBRId = 8;
-        public static final int pivotId = 9;
+        public static final int shooterTLId = 999;
+        public static final int shooterTRId = 999;
+        public static final int shooterBLId = 999;
+        public static final int shooterBRId = 999;
+        public static final int pivotId = 999;
 
         // amp limits
         public static final double statorCurrentLimitAmps = 80.0;
-        public static final double pivotCurrentLimitAmps = 40.0;
+        public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
         public static final double shooterVelocityKp = 0.0;
@@ -244,19 +241,18 @@ public final class Constants {
         public static final double pivotKi = 0.0;
         public static final double pivotKd = 0.0;
         public static final double pivotKs = 0.0;
-        public static final double pivotKv = 0.0;
 
         // lookup table
-        public static final InterpolatingDoubleTreeMap velocityMap = new InterpolatingDoubleTreeMap();
-        public static final InterpolatingDoubleTreeMap angleMap = new InterpolatingDoubleTreeMap();
+        public static final InterpolatingDoubleTreeMap shootingMetersToRpsMap = new InterpolatingDoubleTreeMap();
+        public static final InterpolatingDoubleTreeMap shootingMetersToDegMap = new InterpolatingDoubleTreeMap();
 
         static {
-            velocityMap.put(2.0, 20.0);
-            angleMap.put(2.0, 65.0 );
+            shootingMetersToRpsMap.put(2.0, 20.0);
+            shootingMetersToDegMap.put(2.0, 65.0 );
         }
 
         // TODO: get real diameter this was a rough estimate
-        public static final double drumDiameterMeters = Units.inchesToMeters(4.5);
+        public static final double drumDiameterMeters = Units.inchesToMeters(4.125);
     }
 
     public final static class IntakeConstants {
@@ -264,60 +260,16 @@ public final class Constants {
         public static final int pivotNeoID = 5;
         public static final int rollerTopKrakenID = 999999;
         public static final int rollerBottomKrakenID = 99999;
-        public static final double kP = 0.3;
-        public static final double kS = 0.7;
+        public static final double kP = 0.0;
+        public static final double kS = 0.0;
 
         public static final double intakeStartDegrees = 9999999999999.0; 
 
         // this is used for manually moving intake up and also used while shooting
-        public static final double intakeUpDegrees = 90.0;
+        public static final double intakeUpDegrees = 100.0;
     }
 
-    public final static class VisionConstants {
-        //Camera, IP, hostname
-        //http://10.17.87.12:5800 this is for front/BW2 and fuel/C2     
-        //http://10.17.87.11:5800/ this is for left/BW3, right/BW4, and back/BW1                                           
-
-        public final static Transform3d robotToFront = new Transform3d(
-            new Translation3d(0.258, -0.003, 0.527),
-            new Rotation3d(-Math.toRadians(0.118), -Math.toRadians(25.142), Math.toRadians(0.525))
-        );// 10.5 forward in 0.5 in to right/left, 21.5 in height
-
-        public final static Transform3d robotToLeft = new Transform3d(
-            new Translation3d(-0.015, 0.256, 0.533),
-            new Rotation3d(-Math.toRadians(1.9), -Math.toRadians(22.5), Math.toRadians(94.0))
-        );
-
-        public final static Transform3d robotToRight = new Transform3d(
-            new Translation3d(0.005, -0.262, 0.536),
-            new Rotation3d(-Math.toRadians(0.22), -Math.toRadians(24.3), -Math.toRadians(89.7))
-        );
-
-        public final static Transform3d robotToBack = new Transform3d(
-            new Translation3d(-0.262, 0.002, 0.53),
-            new Rotation3d(-Math.toRadians(0.18), -Math.toRadians(24.9), Math.toRadians(179.9))
-        );
-
-        public final static Transform3d robotToFuelCamera = new Transform3d(
-            new Translation3d(Units.inchesToMeters(-9.75), Units.inchesToMeters(5.5), Units.inchesToMeters(26.)),
-            new Rotation3d(0, Math.toRadians(19), Math.toRadians(-12))
-        );
-
-        public final static String[] tagCameraNames = {
-            "front",
-            "back",
-            "left",
-            "right"
-        };
-
-        public final static Transform3d[] tagCameraTransforms = {
-            robotToFront,
-            robotToBack,
-            robotToLeft,
-            robotToRight
-        };
-
-    }
+    public final static class VisionConstants {}
 
     public final static class LEDConstants {
         public final static int ledPWMPort = 0;

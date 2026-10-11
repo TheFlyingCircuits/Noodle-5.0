@@ -44,7 +44,7 @@ public class IntakeIOMotors implements IntakeIO{
         pivotConfig.closedLoop.positionWrappingEnabled(false);
 
         // account for gear ratio I think its 42:1 then convert rotations to deg by * 360
-        pivotConfig.encoder.positionConversionFactor((1.0/42.0)*360);
+        pivotConfig.encoder.positionConversionFactor((1.0)*360);
 
         pivotNeo.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -55,16 +55,16 @@ public class IntakeIOMotors implements IntakeIO{
        TalonFXConfiguration config = new TalonFXConfiguration();
        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-       config.CurrentLimits.StatorCurrentLimit = 80;
+       config.CurrentLimits.StatorCurrentLimit = 60;
        config.CurrentLimits.StatorCurrentLimitEnable = true;
 
-       config.Slot0.kS = 0.220953;
-       config.Slot0.kV = 0.120283;
+       config.Slot0.kS = 0.2;
+       config.Slot0.kV = 1.0 / ((5800.0/12.0) / 60.0);
        config.Slot0.kP = 0.2;
        config.Slot0.kI = 0.0;
        config.Slot0.kD = 0.0;
        config.ClosedLoopGeneral.ContinuousWrap = true;
-       config.Feedback.RotorToSensorRatio = (31.0/15.0) * (34.0/21.0);// 30/15 and 34 21
+       config.Feedback.RotorToSensorRatio = 1;// 30/15 and 34 21
        rollerTopKraken.applyConfig(config);
     }
 
@@ -73,15 +73,15 @@ public class IntakeIOMotors implements IntakeIO{
        TalonFXConfiguration config = new TalonFXConfiguration();
        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-       config.CurrentLimits.StatorCurrentLimit = 70;
+       config.CurrentLimits.StatorCurrentLimit = 60;
        config.CurrentLimits.StatorCurrentLimitEnable = true;
 
-       config.Slot0.kS = 0.296772;
-       config.Slot0.kV = 0.12771672326;
+       config.Slot0.kS = 0.2;
+       config.Slot0.kV = 1.0 / ((5800.0/12.0) / 60.0);
        config.Slot0.kP = 0.2;
        config.Slot0.kI = 0.0;
        config.Slot0.kD = 0.0;
-       config.Feedback.RotorToSensorRatio = (30.0/15.0) * (21.0/19.0);
+       config.Feedback.RotorToSensorRatio = 1;
        config.ClosedLoopGeneral.ContinuousWrap = true;
        rollerBottomKraken.applyConfig(config);
     }

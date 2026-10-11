@@ -68,5 +68,10 @@ public class Indexer extends SubsystemBase {
             () -> setIndexerVelocity(targetRPS));
     }
 
+    public Command setIndexerVoltsCommand(double volts) {
+        return this.run(
+            () -> io.setIndexerVolts(volts));
+    }
+
 
 }

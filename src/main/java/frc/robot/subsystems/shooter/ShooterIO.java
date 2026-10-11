@@ -24,6 +24,8 @@ public interface ShooterIO {
     public default void setShooterVolts(double volts) {
     }
 
+    public default void setShooterCurrent(double amps) {}
+
     public default void setShooterVelocity(double targetRPS) {
     }
 

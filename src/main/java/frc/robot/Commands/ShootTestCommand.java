@@ -1,16 +1,10 @@
 package frc.robot.Commands;
 
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.FlyingCircuitUtils;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.UniversalConstants;
-import frc.robot.PlayingField.FieldElement;
-import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
@@ -24,7 +18,6 @@ public class ShootTestCommand extends Command {
 
 
     private boolean isShooting = false;
-    private Double driveErrorDeg = 9999.0;
     private ShooterError shooterError = new ShooterError(9999.0, 9999.0);
 
     private Double desiredHoodAngleDeg; 
@@ -37,11 +30,8 @@ public class ShootTestCommand extends Command {
         this.indexer = indexer;
         this.intake = intake;
 
-        FlyingCircuitUtils.putNumberOnDashboard("desiredHoodAngleDeg", 45);
-        FlyingCircuitUtils.putNumberOnDashboard("desiredVelocityRPS", 10);
-
-        desiredHoodAngleDeg = FlyingCircuitUtils.getNumberFromDashboard("desiredHoodAngleDeg", 45);
-        desiredVelocityRPS = FlyingCircuitUtils.getNumberFromDashboard("desiredVelocityRPS", 10);
+        desiredHoodAngleDeg = FlyingCircuitUtils.getNumberFromDashboard("desiredHoodAngleDeg", 55);
+        desiredVelocityRPS = FlyingCircuitUtils.getNumberFromDashboard("desiredVelocityRPS", 40);
 
         addRequirements(shooter,indexer,intake);
     }
@@ -49,7 +39,6 @@ public class ShootTestCommand extends Command {
     @Override
     public void initialize() {
         isShooting = false;
-        driveErrorDeg = 9999.0;
     }
     @Override
     public void execute() {

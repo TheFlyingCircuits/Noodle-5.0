@@ -4,16 +4,21 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.FlyingCircuitUtils;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
     ShooterIOInputsAutoLogged inputs;
+    
 
     // used to eliminate teleportation affeting lookup table
 
     public Shooter(ShooterIO io) {
         this.io = io;
         inputs = new ShooterIOInputsAutoLogged();
+
+        FlyingCircuitUtils.putNumberOnDashboard("drum amps", 0.0);
+        FlyingCircuitUtils.putNumberOnDashboard("hood volts", 0.0);
     }
 
     /**
@@ -45,6 +50,16 @@ public class Shooter extends SubsystemBase {
         return new ShooterError(errorRPS, errorDeg);
     }
 
+    public void tuneShooter() {  
+        io.setShooterCurrent(FlyingCircuitUtils.getNumberFromDashboard("drum amps", 0.0));
+        io.setPivotVolts(FlyingCircuitUtils.getNumberFromDashboard("hood volts", 0.0));
+    }
+
+    public void shooterDefualtFunction() {
+        io.setShooterVolts(0.0);
+        io.setPivotAngle(0.0);
+    }
+
     public double getCurrentShooterRPS() {
         return inputs.shooterVelocityRPS;
     }
@@ -71,6 +86,14 @@ public class Shooter extends SubsystemBase {
 
     public Command setPivotAngleCommand(double targetDegrees) {
         return this.run(() -> io.setPivotAngle(targetDegrees));
+    }
+
+    public Command tuneShooterCommand() {
+        return this.run(() -> tuneShooter());
+    }
+
+    public Command shooterDefualtCommand() {
+        return this.run(() -> shooterDefualtFunction());
     }
 
 }

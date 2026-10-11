@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.PassCommand;
@@ -143,6 +144,10 @@ public class RobotContainer {
         pathTimer = new Timer();
     }
 
+    
+    FlyingCircuitUtils.putNumberOnDashboard("desiredHoodAngleDeg", 55);
+    FlyingCircuitUtils.putNumberOnDashboard("desiredVelocityRPS", 40);
+
     autoChooser = new SendableChooser<>();
     autoChooser.addOption("Left_Trench_Auto", "Left");
     autoChooser.addOption("Right_Trench_Auto", "Right");
@@ -157,10 +162,15 @@ public class RobotContainer {
 
   private void configureBindings() {
     duncanController.rightBumper().whileTrue(autoPassOrShoot());
+
+    duncanController.leftTrigger().whileTrue(intake.intakeDownThenIntakeCommand());
   }
 
   public void setDefaultCommands() {
       drivetrain.setDefaultCommand(driverFullyControlDrivetrain().withName("driveDefualtCommand"));
+      shooter.setDefaultCommand(shooter.shooterDefualtCommand());
+      indexer.setDefaultCommand(indexer.setIndexerVoltsCommand(0.0));
+      intake.setDefaultCommand(intake.intakeDownCommand());
       // canLedsCounter.setDefaultCommand(canLedsCounter.solidColorCommand(Color.fromHSV(canLedsCounter.getAllianceHue(), 255, 255)).ignoringDisable(true));
   }
 
@@ -277,9 +287,11 @@ public class RobotContainer {
   public Command trenchShallowAuto() {
     // need to replace Commands.wait with shooting and add intake and stuff
     return new SequentialCommandGroup(
-      followChoreoCheckpointTrajoectory("Example_auto_1", 0.3, 0.1),
+      followChoreoCheckpointTrajoectory("Example_auto_1", 0.3, 0.1)
+        .deadlineFor(new ParallelCommandGroup(intake.intakeDownThenIntakeCommand(), indexer.setIndexerVoltsCommand(0.0), shooter.shooterDefualtCommand())),
       autoPassOrShoot().withTimeout(3.5),
-      followChoreoCheckpointTrajoectory("Example_auto_p2", 0.3, 0.1),
+      followChoreoCheckpointTrajoectory("Example_auto_p2", 0.3, 0.1)
+        .deadlineFor(new ParallelCommandGroup(intake.intakeDownThenIntakeCommand(), indexer.setIndexerVoltsCommand(0.0), shooter.shooterDefualtCommand())),
       autoPassOrShoot()
     );
   }

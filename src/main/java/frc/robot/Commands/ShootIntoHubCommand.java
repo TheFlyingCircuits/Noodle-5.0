@@ -27,8 +27,8 @@ public class ShootIntoHubCommand extends Command {
     private Double driveErrorDeg = 9999.0;
     private ShooterError shooterError = new ShooterError(9999.0, 9999.0);
 
-    private InterpolatingDoubleTreeMap velocityMap = Constants.ShooterConstants.velocityMap;
-    private InterpolatingDoubleTreeMap angleMap = Constants.ShooterConstants.angleMap;
+    private InterpolatingDoubleTreeMap velocityMap = Constants.ShooterConstants.shootingMetersToRpsMap;
+    private InterpolatingDoubleTreeMap angleMap = Constants.ShooterConstants.shootingMetersToDegMap;
 
 
 
