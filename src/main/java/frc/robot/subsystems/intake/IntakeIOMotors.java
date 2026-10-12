@@ -41,7 +41,7 @@ public class IntakeIOMotors implements IntakeIO{
         pivotConfig.idleMode(IdleMode.kCoast);
         pivotConfig.smartCurrentLimit(40);
         pivotConfig.inverted(true);
-        pivotConfig.closedLoop.positionWrappingEnabled(false);
+        pivotConfig.closedLoop.positionWrappingEnabled(true);
 
         // account for gear ratio I think its 42:1 then convert rotations to deg by * 360
         pivotConfig.encoder.positionConversionFactor((1.0)*360);
@@ -53,7 +53,7 @@ public class IntakeIOMotors implements IntakeIO{
   
     private void configRollerTopKraken() {
        TalonFXConfiguration config = new TalonFXConfiguration();
-       config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
        config.CurrentLimits.StatorCurrentLimit = 60;
        config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -71,7 +71,7 @@ public class IntakeIOMotors implements IntakeIO{
 
     private void configRollerBottomKraken() {
        TalonFXConfiguration config = new TalonFXConfiguration();
-       config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
        config.CurrentLimits.StatorCurrentLimit = 60;
        config.CurrentLimits.StatorCurrentLimitEnable = true;

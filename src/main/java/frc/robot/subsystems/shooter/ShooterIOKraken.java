@@ -62,13 +62,13 @@ public class ShooterIOKraken implements ShooterIO {
         shooterBL.applyConfig(drumConfig);
         shooterBR.applyConfig(drumConfig);
 
-        shooterTR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Aligned));
+        shooterTR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Opposed));
         shooterBL.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Aligned));
-        shooterBR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Aligned));
+        shooterBR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     private void configurePivotMotor() {
-        pivotConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         pivotConfig.CurrentLimits.StatorCurrentLimit = Constants.ShooterConstants.pivotCurrentLimitAmps;
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
