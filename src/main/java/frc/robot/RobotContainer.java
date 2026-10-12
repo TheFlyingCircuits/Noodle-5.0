@@ -163,7 +163,7 @@ public class RobotContainer {
   private void configureBindings() {
     duncanController.rightBumper().whileTrue(autoPassOrShoot());
 
-    duncanController.leftTrigger().whileTrue(intake.intakeDownThenIntakeCommand());
+    duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
   }
 
   public void setDefaultCommands() {
@@ -180,6 +180,11 @@ public class RobotContainer {
     }).finallyDo(() -> {
         Logger.recordOutput("drivetrain/runningDefaultCommand", false);
     }).withName("driverFullyControlDrivetrain");
+  }
+
+  /*** This command works like normal intaking but will periodically load the indexer untill the current ave current spikes.*/
+  public Command intakeAndLoadIndexer() {
+    return intake.intakeDownThenIntakeCommand().alongWith(indexer.periodicallyLoadFuelCommand(2.0));
   }
 
   public boolean shouldShootIntoHub() {
@@ -288,10 +293,10 @@ public class RobotContainer {
     // need to replace Commands.wait with shooting and add intake and stuff
     return new SequentialCommandGroup(
       followChoreoCheckpointTrajoectory("Example_auto_1", 0.3, 0.1)
-        .deadlineFor(new ParallelCommandGroup(intake.intakeDownThenIntakeCommand(), indexer.setIndexerVoltsCommand(0.0), shooter.shooterDefualtCommand())),
+        .deadlineFor(new ParallelCommandGroup(intakeAndLoadIndexer(), shooter.shooterDefualtCommand())),
       autoPassOrShoot().withTimeout(3.5),
       followChoreoCheckpointTrajoectory("Example_auto_p2", 0.3, 0.1)
-        .deadlineFor(new ParallelCommandGroup(intake.intakeDownThenIntakeCommand(), indexer.setIndexerVoltsCommand(0.0), shooter.shooterDefualtCommand())),
+        .deadlineFor(new ParallelCommandGroup(intakeAndLoadIndexer(), shooter.shooterDefualtCommand())),
       autoPassOrShoot()
     );
   }

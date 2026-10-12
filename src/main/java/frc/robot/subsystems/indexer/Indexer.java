@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -12,6 +13,10 @@ import frc.robot.Constants;
 public class Indexer extends SubsystemBase {
     private final IndexerIO io;
     private final IndexerIOInputsAutoLogged inputs;
+
+    private boolean isLoadingFuel = false;
+
+    private Timer indexerTimer;
 
     private final PIDController velocityPID = new PIDController(
     Constants.IndexerConstants.velocityKpVoltsPerRPS,
@@ -26,6 +31,9 @@ public class Indexer extends SubsystemBase {
     public Indexer(IndexerIO io) {
         this.io = io;
         inputs = new IndexerIOInputsAutoLogged();
+
+        indexerTimer = new Timer();
+        indexerTimer.start();
     }
 
     // gets periodically called every 20 ms
@@ -53,6 +61,31 @@ public class Indexer extends SubsystemBase {
         io.setIndexerVolts(outputVolts);
     }
 
+    public void periodicallyLoadFuel(double timeInterval) {
+        if((indexerTimer.get() > timeInterval) || isLoadingFuel) {
+            // at the start of the loading sequence restart the timer so the time interval for loading starts at 0 sec
+            if(!isLoadingFuel) {
+                indexerTimer.restart();
+                isLoadingFuel = true;
+            }
+
+            double currentTime = indexerTimer.get();
+
+            if(currentTime <= 0.5) {
+                setIndexerVelocity(20);
+            } else if (currentTime <= 0.65) {
+                setIndexerVelocity(-20);
+            } else {
+                // this will stop the loading sequence
+                indexerTimer.restart();
+                isLoadingFuel = false;
+            }
+        } else {
+            stopIndexing();
+        }
+        Logger.recordOutput("Loading test", isLoadingFuel);
+    }
+
     public void stopIndexing() {
         io.setIndexerVolts(0.0);
     }
@@ -71,6 +104,10 @@ public class Indexer extends SubsystemBase {
     public Command setIndexerVoltsCommand(double volts) {
         return this.run(
             () -> io.setIndexerVolts(volts));
+    }
+
+    public Command periodicallyLoadFuelCommand(double period) {
+        return this.run(() -> periodicallyLoadFuel(period));
     }
 
 
