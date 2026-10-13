@@ -47,7 +47,7 @@ public class IntakeIOSim implements IntakeIO {
     public void setTargetIntakePositionDegrees(double degrees) {
         double simVolts = 0;
         simTargetPosDegrees = degrees;
-        simVolts = 0.2 * (simTargetPosDegrees - simPosDegrees);
+        simVolts = 0.03 * (simTargetPosDegrees - simPosDegrees);
 
         setIntakeVolts(simVolts);
     };
@@ -65,7 +65,7 @@ public class IntakeIOSim implements IntakeIO {
         Translation2d intakeTranslation2d = drivetrain.odometry.getPoseMeters().getTranslation().plus(new Translation2d(Math.cos(robotYawRad)* 0.1,Math.sin(robotYawRad)*0.0));
 
         Pose3d intakePoseOnRobotSIM = new Pose3d(new Translation3d(intakeTranslation2d.getX(),intakeTranslation2d.getY(),0.0), 
-            new Rotation3d(0,0,drivetrain.odometry.getPoseMeters().getRotation().getRadians()+Units.degreesToRadians(inputs.intakePositionDegrees)));
+            new Rotation3d(0,Units.degreesToRadians(inputs.intakePositionDegrees),drivetrain.odometry.getPoseMeters().getRotation().getRadians()));
 
         Logger.recordOutput("intakePoseOnRobotSIM", intakePoseOnRobotSIM);
     

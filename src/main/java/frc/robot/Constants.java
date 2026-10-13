@@ -30,7 +30,7 @@ public final class Constants {
         public final static double gravityMetersPerSecondSquared = 9.81;
         public final static double defaultPeriodSeconds = 0.02;
 
-        public final static String canivoreName = "CTRENetwork2";
+        public final static String canivoreName = "CANivore";
 
         public enum Direction {
             left,
@@ -190,7 +190,7 @@ public final class Constants {
 
 
     public final static class GyroConstants {
-        public static final int pigeonID = 999;
+        public static final int pigeonID = 48;
 
         //Follow the mount calibration process in Phoenix Tuner to determine these
         public static final double mountPoseYawDegrees = 0.0;
@@ -199,10 +199,10 @@ public final class Constants {
     }
     
     public final static class IndexerConstants {
-        public static final int indexerFLId = 999;
-        public static final int indexerFRId = 999;
-        public static final int indexerBLId = 999;
-        public static final int indexerBRId = 999;
+        public static final int indexerFLId = 3;
+        public static final int indexerFRId = 1;
+        public static final int indexerBLId = 4;
+        public static final int indexerBRId = 2;
 
         public static final double velocityKpVoltsPerRPS = 0.05;
         public static final double velocityKiVoltsPerRPSSecond = 0.0;
@@ -219,11 +219,11 @@ public final class Constants {
     public final static class ShooterConstants {
 
         // motor id
-        public static final int shooterTLId = 999;
-        public static final int shooterTRId = 999;
-        public static final int shooterBLId = 999;
-        public static final int shooterBRId = 999;
-        public static final int pivotId = 999;
+        public static final int shooterTLId = 18;
+        public static final int shooterTRId = 19;
+        public static final int shooterBLId = 20;
+        public static final int shooterBRId = 21;
+        public static final int pivotId = 22;
 
         // amp limits
         public static final double statorCurrentLimitAmps = 80.0;
@@ -258,12 +258,12 @@ public final class Constants {
     public final static class IntakeConstants {
 
         public static final int pivotNeoID = 5;
-        public static final int rollerTopKrakenID = 999999;
-        public static final int rollerBottomKrakenID = 99999;
+        public static final int rollerTopKrakenID = 9;
+        public static final int rollerBottomKrakenID = 10;
         public static final double kP = 0.0;
         public static final double kS = 0.0;
 
-        public static final double intakeStartDegrees = 9999999999999.0; 
+        public static final double intakeStartDegrees = 100.0; 
 
         // this is used for manually moving intake up and also used while shooting
         public static final double intakeUpDegrees = 100.0;

@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -43,6 +44,7 @@ import frc.robot.Commands.ShootIntoHubCommand;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldElement;
 import frc.robot.subsystems.HumanDriver;
+import frc.robot.subsystems.LedsCANdle;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOMapleSim;
 import frc.robot.subsystems.drivetrain.gyro.GyroIOPigeon;
@@ -67,6 +69,7 @@ public class RobotContainer {
     public Indexer indexer;
     public Shooter shooter;
     public Intake intake;
+    public LedsCANdle candle;
 
     Timer pathTimer;
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
@@ -144,6 +147,8 @@ public class RobotContainer {
         pathTimer = new Timer();
     }
 
+    candle = new LedsCANdle(45, 8);
+
     
     FlyingCircuitUtils.putNumberOnDashboard("desiredHoodAngleDeg", 55);
     FlyingCircuitUtils.putNumberOnDashboard("desiredVelocityRPS", 40);
@@ -171,7 +176,7 @@ public class RobotContainer {
       shooter.setDefaultCommand(shooter.shooterDefualtCommand());
       indexer.setDefaultCommand(indexer.setIndexerVoltsCommand(0.0));
       intake.setDefaultCommand(intake.intakeDownCommand());
-      // canLedsCounter.setDefaultCommand(canLedsCounter.solidColorCommand(Color.fromHSV(canLedsCounter.getAllianceHue(), 255, 255)).ignoringDisable(true));
+      candle.setDefaultCommand(candle.solidColorCommand(Color.fromHSV(candle.getAllianceHue(), 255, 255)).ignoringDisable(true));
   }
 
   private Command driverFullyControlDrivetrain() { return drivetrain.run(() -> {
