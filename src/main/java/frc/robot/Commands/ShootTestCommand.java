@@ -30,8 +30,8 @@ public class ShootTestCommand extends Command {
         this.indexer = indexer;
         this.intake = intake;
 
-        desiredHoodAngleDeg = FlyingCircuitUtils.getNumberFromDashboard("desiredHoodAngleDeg", 55);
-        desiredVelocityRPS = FlyingCircuitUtils.getNumberFromDashboard("desiredVelocityRPS", 40);
+        desiredHoodAngleDeg = 30.0;
+        desiredVelocityRPS = 20.0;
 
         addRequirements(shooter,indexer,intake);
     }
@@ -50,11 +50,12 @@ public class ShootTestCommand extends Command {
 
         if (!isShooting) isShooting = shotVelocityInTolerance && shotAngleInTolerance;
 
+        shooterError = shooter.setShot(desiredVelocityRPS, desiredHoodAngleDeg);
+
         if (isShooting) { // when shooting put dt in x to stop moving, run intake and indexer
             indexer.setIndexerVelocity(IndexerConstants.shootingIndexingVelocityRPS);
             intake.intakeUpAndIntake();
         } else { // when not shooting try to get to desired angle and shot speeds
-            shooterError = shooter.setShot(desiredVelocityRPS, desiredHoodAngleDeg);
             indexer.stopIndexing();
             intake.intakeDefault();
             

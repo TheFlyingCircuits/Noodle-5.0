@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.FlyingCircuitUtils;
+import frc.robot.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
@@ -57,7 +58,7 @@ public class Shooter extends SubsystemBase {
 
     public void shooterDefualtFunction() {
         io.setShooterVolts(0.0);
-        io.setPivotAngle(0.0);
+        io.setPivotAngle(ShooterConstants.hoodMinAngleDeg);
     }
 
     public double getCurrentShooterRPS() {

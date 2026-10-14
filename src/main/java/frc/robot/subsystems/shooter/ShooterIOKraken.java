@@ -15,8 +15,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.VendorWrappers.Kraken;
 
 public class ShooterIOKraken implements ShooterIO {
@@ -48,23 +50,26 @@ public class ShooterIOKraken implements ShooterIO {
         drumConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         drumConfig.CurrentLimits.StatorCurrentLimit = Constants.ShooterConstants.statorCurrentLimitAmps;
+        drumConfig.TorqueCurrent.PeakForwardTorqueCurrent = Constants.ShooterConstants.statorCurrentLimitAmps;
+        drumConfig.TorqueCurrent.PeakReverseTorqueCurrent = -Constants.ShooterConstants.statorCurrentLimitAmps;
         drumConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         drumConfig.Slot0.kS = Constants.ShooterConstants.shooterVelocityKs;
         drumConfig.Slot0.kV = Constants.ShooterConstants.shooterVelocityKv;
         drumConfig.Slot0.kP = Constants.ShooterConstants.shooterVelocityKp;
 
-        drumConfig.Feedback.SensorToMechanismRatio = 1.0;
+        drumConfig.Feedback.SensorToMechanismRatio = 40.0/18.0;
 
         shooterTL.applyConfig(drumConfig);
-
-        shooterTR.applyConfig(drumConfig);
         shooterBL.applyConfig(drumConfig);
+
+        drumConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        shooterTR.applyConfig(drumConfig);
         shooterBR.applyConfig(drumConfig);
 
-        shooterTR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Opposed));
-        shooterBL.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Aligned));
-        shooterBR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Opposed));
+        // shooterTR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Opposed));
+        // shooterBL.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Aligned));
+        // shooterBR.setControl(new Follower(shooterTL.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     private void configurePivotMotor() {
@@ -77,24 +82,34 @@ public class ShooterIOKraken implements ShooterIO {
         pivotConfig.Slot0.kP = Constants.ShooterConstants.pivotKp;
 
         // TODO: this is fake gear ratio because it will prob not be 1:1
-        pivotConfig.Feedback.SensorToMechanismRatio = 1.0;
+        pivotConfig.Feedback.SensorToMechanismRatio = (22.0/18.0) * (146.0/10.0);
 
         pivot.applyConfig(pivotConfig);
+        pivot.setPosition(Units.degreesToRotations(11));
     }
 
     @Override
     public void setShooterVolts(double volts) {
         shooterTL.setControl(new VoltageOut(volts));
+        shooterBL.setControl(new VoltageOut(volts));
+        shooterTR.setControl(new VoltageOut(volts));
+        shooterBR.setControl(new VoltageOut(volts));
     }
 
     @Override
     public void setShooterCurrent(double amps) {
         shooterTL.setControl(new TorqueCurrentFOC(Amps.of(amps)));
+        shooterBL.setControl(new TorqueCurrentFOC(Amps.of(amps)));
+        shooterTR.setControl(new TorqueCurrentFOC(Amps.of(amps)));
+        shooterBR.setControl(new TorqueCurrentFOC(Amps.of(amps)));
     }
 
     @Override
     public void setShooterVelocity(double shooterVelocityRPS) {
         shooterTL.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
+        shooterBL.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
+        shooterTR.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
+        shooterBR.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
     }
 
     @Override
@@ -104,6 +119,7 @@ public class ShooterIOKraken implements ShooterIO {
 
     @Override
     public void setPivotAngle(double targetAngleDegrees) {
+        targetAngleDegrees = MathUtil.clamp(targetAngleDegrees, ShooterConstants.hoodMinAngleDeg, ShooterConstants.hoodMaxAngleDeg);
         pivot.setControl(new PositionVoltage(Units.degreesToRotations(targetAngleDegrees)));
     }
 

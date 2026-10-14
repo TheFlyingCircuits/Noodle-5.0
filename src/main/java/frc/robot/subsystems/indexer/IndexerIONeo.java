@@ -33,21 +33,21 @@ public class IndexerIONeo implements IndexerIO {
         // base config
         indexerConfig = new SparkMaxConfig();
         indexerConfig.idleMode(IdleMode.kCoast);
-        indexerConfig.inverted(true); //TODO set real invertion
+        indexerConfig.inverted(false); //TODO set real invertion
         indexerConfig.encoder.velocityConversionFactor(1.0/60.0); // convert rpm to rps
         indexerFL.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // follow config
         indexerFollowConfig = indexerConfig;
-        indexerFollowConfig.follow(Constants.IndexerConstants.indexerFLId);
+        indexerBR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        indexerFollowConfig.inverted(true);
+        indexerFollowConfig.follow(Constants.IndexerConstants.indexerFLId);
         indexerBL.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        // invert right side motors
-        indexerFollowConfig.inverted(true);
-        
+        indexerFollowConfig.inverted(false);
         indexerFR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        indexerBR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // indexerFollowConfig.inverted(true);
     }
 
 

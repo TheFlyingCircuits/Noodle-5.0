@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("intakeInputs", inputs);
-        isIntakeDown = inputs.intakePositionDegrees < 15.0;
+        isIntakeDown = inputs.intakePositionDegrees < 4.0;
     }
 
     public boolean isIntakeDown() {
@@ -31,8 +31,8 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeRunRollers() {
-        io.setTargetRollerBottomVelocity(50.0);
-        io.setTargetRollerTopVelocity(50.0);
+        io.setTargetRollerBottomVelocity(15.0);
+        io.setTargetRollerTopVelocity(15.0);
     }
 
     public void intakeRollersStop() {
@@ -47,7 +47,7 @@ public class Intake extends SubsystemBase {
 
     public void intakeDown() {
         intakeRollersStop();
-        if(inputs.intakePositionDegrees > 15.0) {
+        if(inputs.intakePositionDegrees > 4.0) {
             isIntakeDown = false;
             io.setTargetIntakePositionDegrees(0); 
         } else {
@@ -57,13 +57,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeDownThenIntake() {
-        if(inputs.intakePositionDegrees > 15.0) {
+        if(inputs.intakePositionDegrees > 4.0) {
             isIntakeDown = false;
             io.setTargetIntakePositionDegrees(0);
             // reverseIntake();
         } else {
             isIntakeDown = true;
-            if(inputs.intakePositionDegrees < 10.0) {
+            if(inputs.intakePositionDegrees < 4.0) {
                 intakeRunRollers();
             }
             intakeDefault();

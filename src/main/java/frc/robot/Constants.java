@@ -204,15 +204,15 @@ public final class Constants {
         public static final int indexerBLId = 4;
         public static final int indexerBRId = 2;
 
-        public static final double velocityKpVoltsPerRPS = 0.05;
+        public static final double velocityKpVoltsPerRPS = 0.2;
         public static final double velocityKiVoltsPerRPSSecond = 0.0;
         public static final double velocityKdVoltsPerRPSPerSecond = 0.0;
 
-        public static final double velocityKsVolts = 0.2;
-        public static final double velocityKvVoltsPerRPS = (12.0 / 5800.0) / 60.0;
+        public static final double velocityKsVolts = 1.4;
+        public static final double velocityKvVoltsPerRPS = (12.0 / (5800.0 / 60.0));
         public static final double simVelocityTimeConstantSeconds = 0.1;
 
-        public static final double shootingIndexingVelocityRPS = 70.0;
+        public static final double shootingIndexingVelocityRPS = 35.0;
 
     }
     
@@ -226,21 +226,24 @@ public final class Constants {
         public static final int pivotId = 22;
 
         // amp limits
-        public static final double statorCurrentLimitAmps = 80.0;
+        public static final double statorCurrentLimitAmps = 90.0;
         public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        public static final double shooterVelocityKp = 0.0;
+        public static final double shooterVelocityKp = 4.5;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
-        public static final double shooterVelocityKs = 0.0;
+        public static final double shooterVelocityKs = 6.5;
         public static final double shooterVelocityKv = 0.0;
 
         // Pivot angle PID + feedforward tuning
-        public static final double pivotKp = 0.0;
+        public static final double pivotKp = 68.0;
         public static final double pivotKi = 0.0;
         public static final double pivotKd = 0.0;
-        public static final double pivotKs = 0.0;
+        public static final double pivotKs = 0.8;
+
+        public static final double hoodMinAngleDeg = 11.0;
+        public static final double hoodMaxAngleDeg = 48.0;
 
         // lookup table
         public static final InterpolatingDoubleTreeMap shootingMetersToRpsMap = new InterpolatingDoubleTreeMap();
@@ -260,13 +263,13 @@ public final class Constants {
         public static final int pivotNeoID = 5;
         public static final int rollerTopKrakenID = 9;
         public static final int rollerBottomKrakenID = 10;
-        public static final double kP = 0.0;
-        public static final double kS = 0.0;
+        public static final double kP = 0.075;
+        public static final double kS = 0.5;
 
-        public static final double intakeStartDegrees = 100.0; 
+        public static final double intakeStartDegrees = 108.49; 
 
         // this is used for manually moving intake up and also used while shooting
-        public static final double intakeUpDegrees = 100.0;
+        public static final double intakeUpDegrees = intakeStartDegrees;
     }
 
     public final static class VisionConstants {}

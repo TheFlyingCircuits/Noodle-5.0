@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.PassCommand;
 import frc.robot.Commands.ShootIntoHubCommand;
+import frc.robot.Commands.ShootTestCommand;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldElement;
 import frc.robot.subsystems.HumanDriver;
@@ -74,7 +75,7 @@ public class RobotContainer {
     Timer pathTimer;
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
 
-    private SwerveDriveSimulation swerveDriveSimulation;
+    private SwerveDriveSimulation swerveDriveSimulation = null;
 
     private final SendableChooser<String> autoChooser;
     private String currentAuto = "none";
@@ -85,10 +86,10 @@ public class RobotContainer {
         // NOODLE OFFSETS: FL -0.184814453125, FR 0.044677734375, BL -0.3349609375, BR 0.088134765625 
         drivetrain = new Drivetrain( 
             new GyroIOPigeon(),
-            new SwerveModuleIOKraken(1, 2, -0.260498, 1, "FL", true), 
-            new SwerveModuleIOKraken(3, 4, 0.429199, 2, "FR", false),
-            new SwerveModuleIOKraken(5, 6, -0.033203, 3, "BL", true),
-            new SwerveModuleIOKraken(7, 8,  0.098389, 4, "BR", false) 
+            new SwerveModuleIOKraken(1, 2, -0.111328 , 1, "FL", true), 
+            new SwerveModuleIOKraken(3, 4, 0.256836 , 2, "FR", false),
+            new SwerveModuleIOKraken(5, 6, 0.337646  , 3, "BL", true),
+            new SwerveModuleIOKraken(7, 8,  -0.308105 , 4, "BR", false) 
         );
         indexer = new Indexer(new IndexerIONeo());
         shooter = new Shooter(new ShooterIOKraken());
@@ -150,8 +151,8 @@ public class RobotContainer {
     candle = new LedsCANdle(45, 8);
 
     
-    FlyingCircuitUtils.putNumberOnDashboard("desiredHoodAngleDeg", 55);
-    FlyingCircuitUtils.putNumberOnDashboard("desiredVelocityRPS", 40);
+    FlyingCircuitUtils.putNumberOnDashboard("desiredHoodAngleDeg", 30);
+    FlyingCircuitUtils.putNumberOnDashboard("desiredVelocityRPS", 20);
 
     autoChooser = new SendableChooser<>();
     autoChooser.addOption("Left_Trench_Auto", "Left");
@@ -166,9 +167,12 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    duncanController.rightBumper().whileTrue(autoPassOrShoot());
+    // duncanController.rightBumper().whileTrue(autoPassOrShoot());
 
     duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
+    duncanController.b().whileTrue(intake.intakeUpCommand());
+    duncanController.a().whileTrue(ShootCommand());
+    duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
   }
 
   public void setDefaultCommands() {
@@ -176,7 +180,7 @@ public class RobotContainer {
       shooter.setDefaultCommand(shooter.shooterDefualtCommand());
       indexer.setDefaultCommand(indexer.setIndexerVoltsCommand(0.0));
       intake.setDefaultCommand(intake.intakeDownCommand());
-      candle.setDefaultCommand(candle.solidColorCommand(Color.fromHSV(candle.getAllianceHue(), 255, 255)).ignoringDisable(true));
+      candle.setDefaultCommand(candle.heartbeatCommand().ignoringDisable(true));
   }
 
   private Command driverFullyControlDrivetrain() { return drivetrain.run(() -> {
@@ -190,6 +194,10 @@ public class RobotContainer {
   /*** This command works like normal intaking but will periodically load the indexer untill the current ave current spikes.*/
   public Command intakeAndLoadIndexer() {
     return intake.intakeDownThenIntakeCommand().alongWith(indexer.periodicallyLoadFuelCommand(2.0));
+  }
+
+  public Command ShootCommand() {
+    return new ShootTestCommand(shooter, indexer, intake);
   }
 
   public boolean shouldShootIntoHub() {
