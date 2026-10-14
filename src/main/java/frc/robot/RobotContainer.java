@@ -86,10 +86,10 @@ public class RobotContainer {
         // NOODLE OFFSETS: FL -0.184814453125, FR 0.044677734375, BL -0.3349609375, BR 0.088134765625 
         drivetrain = new Drivetrain( 
             new GyroIOPigeon(),
-            new SwerveModuleIOKraken(1, 2, -0.111328 , 1, "FL", true), 
-            new SwerveModuleIOKraken(3, 4, 0.256836 , 2, "FR", false),
-            new SwerveModuleIOKraken(5, 6, 0.337646  , 3, "BL", true),
-            new SwerveModuleIOKraken(7, 8,  -0.308105 , 4, "BR", false) 
+            new SwerveModuleIOKraken(1, 2, -0.110352  , 1, "FL", true), 
+            new SwerveModuleIOKraken(3, 4, 0.252441 , 2, "FR", false),
+            new SwerveModuleIOKraken(5, 6, 0.337646   , 3, "BL", true),
+            new SwerveModuleIOKraken(7, 8,  -0.301514 , 4, "BR", false) 
         );
         indexer = new Indexer(new IndexerIONeo());
         shooter = new Shooter(new ShooterIOKraken());
@@ -167,21 +167,21 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // duncanController.rightBumper().whileTrue(autoPassOrShoot());
+    duncanController.rightBumper().whileTrue(autoPassOrShoot());
 
-    // duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
-    // duncanController.b().whileTrue(intake.intakeUpCommand());
-    // duncanController.a().whileTrue(ShootCommand());
-    // duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
-    duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));
+    duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
+    duncanController.b().whileTrue(intake.intakeUpCommand());
+    duncanController.a().whileTrue(ShootCommand());
+    duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
+    // duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));
   }
 
   public void setDefaultCommands() {
-      // drivetrain.setDefaultCommand(driverFullyControlDrivetrain().withName("driveDefualtCommand"));
-      // shooter.setDefaultCommand(shooter.shooterDefualtCommand());
+      drivetrain.setDefaultCommand(driverFullyControlDrivetrain().withName("driveDefualtCommand"));
+      shooter.setDefaultCommand(shooter.shooterDefualtCommand());
       indexer.setDefaultCommand(indexer.setIndexerVoltsCommand(0.0));
-      // intake.setDefaultCommand(intake.intakeDownCommand());
-      // candle.setDefaultCommand(candle.heartbeatCommand().ignoringDisable(true));
+      intake.setDefaultCommand(intake.intakeDownCommand());
+      candle.setDefaultCommand(candle.heartbeatCommand().ignoringDisable(true));
   }
 
   private Command driverFullyControlDrivetrain() { return drivetrain.run(() -> {
@@ -265,7 +265,8 @@ public class RobotContainer {
    * so the vision can reseed the pose so that this method wont overide it each loop.
    */
   public void setPoseToAutoStart() {
-    if(!(currentAuto.equals(autoChooser.getSelected()))) {
+    if(!autoChooser.getSelected().isEmpty()) {
+      if(!(currentAuto.equals(autoChooser.getSelected()))) {
       Optional<Trajectory<SwerveSample>> optionalTrajectory = Choreo.loadTrajectory("Example_auto_1");
       // if(optionalTrajectory.isEmpty()) return;
 
@@ -285,6 +286,7 @@ public class RobotContainer {
       if(targetPose.equals(currentPose)){
         currentAuto = autoChooser.getSelected();
       }
+    }
     }
   }
 

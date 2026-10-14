@@ -33,8 +33,8 @@ public class Drivetrain extends SubsystemBase {
 
     private final PIDController xController = new PIDController(5.5, 0.1, 0.0);
     private final PIDController yController = new PIDController(5.5, 0.1, 0.0);
-    private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
-    private final PIDController headingControllerAiming = new PIDController(8.0, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController headingControllerAiming = new PIDController(10.0, 0.0, 0.0);
 
     public Drivetrain(
         GyroIO gyroIO, 

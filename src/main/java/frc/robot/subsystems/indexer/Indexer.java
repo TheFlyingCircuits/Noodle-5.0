@@ -70,11 +70,12 @@ public class Indexer extends SubsystemBase {
             }
 
             double currentTime = indexerTimer.get();
+            stopIndexing();
 
-            if(currentTime <= 0.5) {
-                setIndexerVelocity(40);
-            } else if (currentTime <= 0.6) {
-                setIndexerVelocity(-15);
+            if(currentTime <= 0.25) {
+                // setIndexerVelocity(10);
+            } else if (currentTime <= 0.28) {
+                // setIndexerVelocity(-8);
             } else {
                 // this will stop the loading sequence
                 indexerTimer.restart();

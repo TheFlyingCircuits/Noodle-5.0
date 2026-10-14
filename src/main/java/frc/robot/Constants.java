@@ -41,9 +41,9 @@ public final class Constants {
 
         public static final double bumperWidthMeters = Units.inchesToMeters(27 + 7);
 
-        public static final double drivetrainShotToleranceDeg = 2.0;
-        public static final double shooterShotRPSTolerance = 2.0;
-        public static final double shooterShotTolgeranceDeg = 2.0;
+        public static final double drivetrainShotToleranceDeg = 2.5;
+        public static final double shooterShotRPSTolerance = 0.45;
+        public static final double shooterShotTolgeranceDeg = 1.8;
     }
 
     public final static class ControllerConstants {
@@ -204,7 +204,7 @@ public final class Constants {
         public static final int indexerBLId = 4;
         public static final int indexerBRId = 2;
 
-        public static final double velocityKpVoltsPerRPS = 0.05; // was 0.2
+        public static final double velocityKpVoltsPerRPS = 0.1; // was 0.2
         public static final double velocityKiVoltsPerRPSSecond = 0.0;
         public static final double velocityKdVoltsPerRPSPerSecond = 0.0;
 
@@ -212,7 +212,7 @@ public final class Constants {
         public static final double velocityKvVoltsPerRPS = (12.0 / (5800.0 / 60.0));
         public static final double simVelocityTimeConstantSeconds = 0.1;
 
-        public static final double shootingIndexingVelocityRPS = 35.0;
+        public static final double shootingIndexingVelocityRPS = 20.0;
 
     }
     
@@ -230,17 +230,17 @@ public final class Constants {
         public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        public static final double shooterVelocityKp = 5.5;
+        public static final double shooterVelocityKp = 28.0;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
         public static final double shooterVelocityKs = 6.5;
         public static final double shooterVelocityKv = 0.0;
 
         // Pivot angle PID + feedforward tuning
-        public static final double pivotKp = 68.0;
+        public static final double pivotKp = 85.0;
         public static final double pivotKi = 0.0;
         public static final double pivotKd = 0.0;
-        public static final double pivotKs = 0.8;
+        public static final double pivotKs = 0.65;
 
         public static final double hoodMinAngleDeg = 11.0;
         public static final double hoodMaxAngleDeg = 48.0;
@@ -250,8 +250,15 @@ public final class Constants {
         public static final InterpolatingDoubleTreeMap shootingMetersToDegMap = new InterpolatingDoubleTreeMap();
 
         static {
-            shootingMetersToRpsMap.put(2.0, 20.0);
-            shootingMetersToDegMap.put(2.0, 65.0 );
+            shootingMetersToRpsMap.put(2.73413, 26.0);
+            shootingMetersToDegMap.put(2.73413, 19.0 );
+
+            shootingMetersToRpsMap.put(4.384109, 30.0);
+            shootingMetersToDegMap.put(4.384109, 25.0);
+
+            shootingMetersToRpsMap.put(3.451033, 28.2);
+            shootingMetersToDegMap.put(3.451033, 23.1
+             );
         }
 
         // TODO: get real diameter this was a rough estimate

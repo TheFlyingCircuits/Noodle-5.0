@@ -32,7 +32,7 @@ public class IndexerIONeo implements IndexerIO {
 
         // base config
         indexerConfig = new SparkMaxConfig();
-        indexerConfig.smartCurrentLimit(50);
+        indexerConfig.smartCurrentLimit(70);
         indexerConfig.idleMode(IdleMode.kCoast);
         indexerConfig.inverted(false); //TODO set real invertion
         indexerConfig.encoder.velocityConversionFactor(1.0/60.0); // convert rpm to rps
@@ -47,8 +47,8 @@ public class IndexerIONeo implements IndexerIO {
 
     @Override
     public void setIndexerVolts(double volts) {
-        // indexerFL.setVoltage(volts);
-        // indexerBL.setVoltage(volts);
+        indexerFL.setVoltage(volts);
+        indexerBL.setVoltage(volts);
         indexerFR.setVoltage(volts);
         indexerBR.setVoltage(volts);
     }

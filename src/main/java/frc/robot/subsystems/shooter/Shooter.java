@@ -58,7 +58,7 @@ public class Shooter extends SubsystemBase {
 
     public void shooterDefualtFunction() {
         io.setShooterVolts(0.0);
-        io.setPivotAngle(ShooterConstants.hoodMinAngleDeg);
+        io.setPivotAngle(ShooterConstants.hoodMinAngleDeg + 1.0);
     }
 
     public double getCurrentShooterRPS() {

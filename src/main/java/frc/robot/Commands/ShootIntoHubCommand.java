@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.UniversalConstants;
+import frc.robot.FlyingCircuitUtils;
 import frc.robot.PlayingField.FieldElement;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.indexer.Indexer;
@@ -52,6 +53,10 @@ public class ShootIntoHubCommand extends Command {
     @Override
     public void execute() {
         Double robotDistanceToHub = drivetrain.odometry.getPoseMeters().getTranslation().getDistance(FieldElement.HUB.getPose2d().getTranslation());
+        Logger.recordOutput("ShootIntoHubCommand/robotDistanceToHub", robotDistanceToHub);
+        // shooterError = shooter.setShot(velocityMap.get(robotDistanceToHub), angleMap.get(robotDistanceToHub));
+        shooterError = shooter.setShot(    FlyingCircuitUtils.getNumberFromDashboard("desiredVelocityRPS", 20),
+            FlyingCircuitUtils.getNumberFromDashboard("desiredHoodAngleDeg", 30));
 
         boolean drivetrainInTolerance = UniversalConstants.drivetrainShotToleranceDeg > Math.abs(driveErrorDeg);
         boolean shotVelocityInTolerance = UniversalConstants.shooterShotRPSTolerance > Math.abs(shooterError.velocityErrorRPS());
@@ -66,7 +71,6 @@ public class ShootIntoHubCommand extends Command {
             intake.intakeUpAndIntake();
         } else { // when not shooting try to get to desired angle and shot speeds
             driveErrorDeg = Units.radiansToDegrees(drivetrain.aimAtTranslation(FieldElement.HUB.getPose2d().getTranslation(), true));
-            shooterError = shooter.setShot(velocityMap.get(robotDistanceToHub), angleMap.get(robotDistanceToHub));
             indexer.stopIndexing();
             intake.intakeDefault();
             
