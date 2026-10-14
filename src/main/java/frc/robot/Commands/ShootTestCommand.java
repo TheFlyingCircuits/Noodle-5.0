@@ -18,10 +18,10 @@ public class ShootTestCommand extends Command {
 
 
     private boolean isShooting = false;
-    private ShooterError shooterError = new ShooterError(9999.0, 9999.0);
+    private ShooterError shooterError;
 
-    private Double desiredHoodAngleDeg; 
-    private Double desiredVelocityRPS;
+    private double desiredHoodAngleDeg; 
+    private double desiredVelocityRPS;
 
 
 
@@ -30,18 +30,21 @@ public class ShootTestCommand extends Command {
         this.indexer = indexer;
         this.intake = intake;
 
-        desiredHoodAngleDeg = 30.0;
-        desiredVelocityRPS = 20.0;
-
         addRequirements(shooter,indexer,intake);
     }
 
     @Override
     public void initialize() {
         isShooting = false;
+        desiredHoodAngleDeg = 30.0;
+        desiredVelocityRPS = 20.0;
+        shooterError = new ShooterError(9999.0, 9999.0);
     }
+
     @Override
     public void execute() {
+
+        shooterError = shooter.setShot(desiredVelocityRPS, desiredHoodAngleDeg);
 
         boolean shotVelocityInTolerance = UniversalConstants.shooterShotRPSTolerance > Math.abs(shooterError.velocityErrorRPS());
         boolean shotAngleInTolerance = UniversalConstants.shooterShotTolgeranceDeg > Math.abs(shooterError.angleErrorDeg());
@@ -49,8 +52,6 @@ public class ShootTestCommand extends Command {
         // once is shooting is on it does not go off
 
         if (!isShooting) isShooting = shotVelocityInTolerance && shotAngleInTolerance;
-
-        shooterError = shooter.setShot(desiredVelocityRPS, desiredHoodAngleDeg);
 
         if (isShooting) { // when shooting put dt in x to stop moving, run intake and indexer
             indexer.setIndexerVelocity(IndexerConstants.shootingIndexingVelocityRPS);

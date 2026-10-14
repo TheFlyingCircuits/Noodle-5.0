@@ -14,21 +14,22 @@ import frc.robot.PlayingField.FieldConstants;;
 //The only thing we take into accound is that the spread of the data increases at larger distances
 //Plot standard deviation and distance in desmos
 
-public record SingleTagPoseObservation (String camName, Pose3d robotPose, double timestampSeconds, RawFiducial[] tagsUsed, double tagToCamMeters, double ambiguity, boolean usingMultiTag, int closestTagID) {
+public record SingleTagPoseObservation (String camName, Pose3d robotPose, double timestampSeconds, RawFiducial[] tagsUsed, double tagToCamMeters, 
+double ambiguity, boolean usingMultiTag, int closestTagID, double yawRateRad) {
+
     public Matrix<N3, N1> getStandardDeviations(boolean isScoringInHub) {
 
         if(usingMultiTag) {
             return VecBuilder.fill(
-            0.01,
-            0.01,
-            0.05
-        );
-        
+                0.1 + yawRateRad * 1.0,
+                0.1 + yawRateRad * 1.0,
+                0.5 + yawRateRad * 1.0
+            );
         }
         // double slopeStdDevMeters_PerMeter = 0.0023;
-        double xyStdDev = 0.1 * Math.pow(tagToCamMeters, 2);
+        double xyStdDev = (0.1 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 1.0;
 
-        double rotStdDev = 0.25 * Math.pow(tagToCamMeters, 2);
+        double rotStdDev = (0.05 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 1.0;
 
         return VecBuilder.fill(
             xyStdDev,

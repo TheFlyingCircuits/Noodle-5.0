@@ -213,7 +213,7 @@ public class Odometry {
             // Logger.recordOutput("Odometry/Pose ambiguity", poseObservation.ambiguity());
 
             // reject tags that are too ambiguous
-            if (poseAmbiguity > 0.7) {
+            if (poseAmbiguity > 0.5) {
                 Logger.recordOutput("Odometry/Pose ambiguity", poseObservation.ambiguity());
                 rejectedTags.add(poseObservation.getTagPose());
                 continue;
@@ -222,7 +222,7 @@ public class Odometry {
              Matrix<N3, N1> stdDevs;
 
             // if we have seen a good enough tag then start using mt2
-            if(!(hasSeenGoodTag) && (tagToCamMeters < 4.5) && (poseAmbiguity < 0.26)) {
+            if(!(hasSeenGoodTag) && (tagToCamMeters < 4.0) && (poseAmbiguity < 0.20)) {
                 hasSeenGoodTag = true;
                 Logger.recordOutput("Odometry/hasSeenGoodTag", hasSeenGoodTag);
                 limelights.setIMUModeNextLoop(3);

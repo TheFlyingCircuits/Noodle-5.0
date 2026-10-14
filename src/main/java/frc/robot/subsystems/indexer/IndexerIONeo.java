@@ -32,28 +32,25 @@ public class IndexerIONeo implements IndexerIO {
 
         // base config
         indexerConfig = new SparkMaxConfig();
+        indexerConfig.smartCurrentLimit(50);
         indexerConfig.idleMode(IdleMode.kCoast);
         indexerConfig.inverted(false); //TODO set real invertion
         indexerConfig.encoder.velocityConversionFactor(1.0/60.0); // convert rpm to rps
         indexerFL.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        // follow config
-        indexerFollowConfig = indexerConfig;
-        indexerBR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        indexerFollowConfig.inverted(true);
-        indexerFollowConfig.follow(Constants.IndexerConstants.indexerFLId);
-        indexerBL.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        indexerFollowConfig.inverted(false);
-        indexerFR.configure(indexerFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        // indexerFollowConfig.inverted(true);
+        // indexerConfig.inverted(true);
+         indexerBL.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        indexerConfig.inverted(true);
+        indexerFR.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        indexerBR.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
 
     @Override
     public void setIndexerVolts(double volts) {
-        indexerFL.setVoltage(volts);
+        // indexerFL.setVoltage(volts);
+        // indexerBL.setVoltage(volts);
+        indexerFR.setVoltage(volts);
+        indexerBR.setVoltage(volts);
     }
 
     @Override

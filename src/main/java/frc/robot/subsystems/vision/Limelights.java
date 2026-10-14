@@ -17,6 +17,7 @@ public class Limelights {
         this.camNames=camNames;
         for(String camName : camNames) {
             LimelightHelpers.setPipelineIndex(camName, 0);
+            LimelightHelpers.SetIMUAssistAlpha(camName, 0.05);
         }
     }
 
@@ -24,9 +25,10 @@ public class Limelights {
         ArrayList<SingleTagPoseObservation> poseObservations = new ArrayList<SingleTagPoseObservation>();
 
         for(String camName : camNames) {
+            double robotYawRateRad = drivetrain.getRobotRelativeVelocityMPS().omegaRadiansPerSecond;
             LimelightHelpers.SetRobotOrientation(
                 camName, drivetrain.odometry.getPoseMeters().getRotation().getDegrees(), 
-                Units.radiansToDegrees(drivetrain.getRobotRelativeVelocityMPS().omegaRadiansPerSecond), 0, 0, 0, 0);
+                Units.radiansToDegrees(robotYawRateRad), 0, 0, 0, 0);
 
             if(usingMT2) {
                 LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camName);
@@ -42,7 +44,7 @@ public class Limelights {
 
                     SingleTagPoseObservation poseObservation = new SingleTagPoseObservation(
                         camName, new Pose3d(mt2.pose), mt2.timestampSeconds, fiducialsUsed, 
-                            closestTag.distToCamera, 0.0, seesMultibleTags, closestTag.id);
+                            closestTag.distToCamera, 0.0, seesMultibleTags, closestTag.id, robotYawRateRad);
 
                     poseObservations.add(poseObservation);
                 }
@@ -60,7 +62,7 @@ public class Limelights {
 
                     SingleTagPoseObservation poseObservation = new SingleTagPoseObservation(
                         camName, new Pose3d(mt1.pose), mt1.timestampSeconds, fiducialsUsed, 
-                            closestTag.distToCamera, closestTag.ambiguity, seesMultibleTags, closestTag.id);
+                            closestTag.distToCamera, closestTag.ambiguity, seesMultibleTags, closestTag.id, robotYawRateRad);
 
                     poseObservations.add(poseObservation);
                 }

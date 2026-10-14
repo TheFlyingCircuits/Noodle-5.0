@@ -204,11 +204,11 @@ public final class Constants {
         public static final int indexerBLId = 4;
         public static final int indexerBRId = 2;
 
-        public static final double velocityKpVoltsPerRPS = 0.2;
+        public static final double velocityKpVoltsPerRPS = 0.05; // was 0.2
         public static final double velocityKiVoltsPerRPSSecond = 0.0;
         public static final double velocityKdVoltsPerRPSPerSecond = 0.0;
 
-        public static final double velocityKsVolts = 1.4;
+        public static final double velocityKsVolts = 0.35;
         public static final double velocityKvVoltsPerRPS = (12.0 / (5800.0 / 60.0));
         public static final double simVelocityTimeConstantSeconds = 0.1;
 
@@ -230,7 +230,7 @@ public final class Constants {
         public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        public static final double shooterVelocityKp = 4.5;
+        public static final double shooterVelocityKp = 5.5;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
         public static final double shooterVelocityKs = 6.5;

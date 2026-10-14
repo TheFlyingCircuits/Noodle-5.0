@@ -169,18 +169,19 @@ public class RobotContainer {
   private void configureBindings() {
     // duncanController.rightBumper().whileTrue(autoPassOrShoot());
 
-    duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
-    duncanController.b().whileTrue(intake.intakeUpCommand());
-    duncanController.a().whileTrue(ShootCommand());
-    duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
+    // duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
+    // duncanController.b().whileTrue(intake.intakeUpCommand());
+    // duncanController.a().whileTrue(ShootCommand());
+    // duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
+    duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));
   }
 
   public void setDefaultCommands() {
-      drivetrain.setDefaultCommand(driverFullyControlDrivetrain().withName("driveDefualtCommand"));
-      shooter.setDefaultCommand(shooter.shooterDefualtCommand());
+      // drivetrain.setDefaultCommand(driverFullyControlDrivetrain().withName("driveDefualtCommand"));
+      // shooter.setDefaultCommand(shooter.shooterDefualtCommand());
       indexer.setDefaultCommand(indexer.setIndexerVoltsCommand(0.0));
-      intake.setDefaultCommand(intake.intakeDownCommand());
-      candle.setDefaultCommand(candle.heartbeatCommand().ignoringDisable(true));
+      // intake.setDefaultCommand(intake.intakeDownCommand());
+      // candle.setDefaultCommand(candle.heartbeatCommand().ignoringDisable(true));
   }
 
   private Command driverFullyControlDrivetrain() { return drivetrain.run(() -> {
