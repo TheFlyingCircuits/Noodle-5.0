@@ -47,6 +47,7 @@ public class Odometry {
     public SwerveDrivePoseEstimator wheelsOnlyPoseEstimator;
 
     public Odometry(Drivetrain drivetrain, GyroIO gyroIO) {
+        Logger.recordOutput("Odometry/hasSeenGoodTag", hasSeenGoodTag);
         this.drivetrain=drivetrain;
 
         this.gyroIO = gyroIO;

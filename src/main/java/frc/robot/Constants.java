@@ -42,7 +42,7 @@ public final class Constants {
         public static final double bumperWidthMeters = Units.inchesToMeters(27 + 7);
 
         public static final double drivetrainShotToleranceDeg = 1.5;
-        public static final double shooterShotRPSTolerance = 0.45;
+        public static final double shooterShotRPSTolerance = 1.0;
         public static final double shooterShotTolgeranceDeg = 1.8;
     }
 
@@ -212,7 +212,7 @@ public final class Constants {
         public static final double velocityKvVoltsPerRPS = (12.0 / (5800.0 / 60.0));
         public static final double simVelocityTimeConstantSeconds = 0.1;
 
-        public static final double shootingIndexingVelocityRPS = 30.0;
+        public static final double shootingIndexingVelocityRPS = 20.0;
 
     }
     
@@ -230,10 +230,11 @@ public final class Constants {
         public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        public static final double shooterVelocityKp = 20.0;
+        // public static final double shooterVelocityKp = 20.0; this was old and other is bang bang
+        public static final double shooterVelocityKp = 99999.0;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
-        public static final double shooterVelocityKs = 6.5;
+        public static final double shooterVelocityKs = 6.4;
         public static final double shooterVelocityKv = 0.0;
 
         // Pivot angle PID + feedforward tuning
@@ -276,8 +277,8 @@ public final class Constants {
         public static final int pivotNeoID = 5;
         public static final int rollerTopKrakenID = 9;
         public static final int rollerBottomKrakenID = 10;
-        public static final double kP = 0.075;
-        public static final double kS = 0.5;
+        public static final double kP = 0.09;
+        public static final double kS = 0.7;
 
         public static final double intakeStartDegrees = 108.49; 
 

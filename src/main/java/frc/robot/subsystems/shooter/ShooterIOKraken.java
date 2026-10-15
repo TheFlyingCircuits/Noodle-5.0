@@ -51,7 +51,8 @@ public class ShooterIOKraken implements ShooterIO {
         drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         drumConfig.CurrentLimits.StatorCurrentLimit = Constants.ShooterConstants.statorCurrentLimitAmps;
         drumConfig.TorqueCurrent.PeakForwardTorqueCurrent = Constants.ShooterConstants.statorCurrentLimitAmps;
-        drumConfig.TorqueCurrent.PeakReverseTorqueCurrent = -Constants.ShooterConstants.statorCurrentLimitAmps;
+        // drumConfig.TorqueCurrent.PeakReverseTorqueCurrent = -Constants.ShooterConstants.statorCurrentLimitAmps;
+        drumConfig.TorqueCurrent.PeakReverseTorqueCurrent = 0;
         drumConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         drumConfig.Slot0.kS = Constants.ShooterConstants.shooterVelocityKs;

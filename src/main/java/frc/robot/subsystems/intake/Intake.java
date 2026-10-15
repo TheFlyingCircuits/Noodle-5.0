@@ -84,9 +84,11 @@ public class Intake extends SubsystemBase {
         if(inputs.intakePositionDegrees > 6.0) {
             io.setTargetRollerBottomVelocity(15.0);
             io.setTargetRollerTopVelocity(15.0);
+            // io.setRollerTopVolts(0.0);
+            // io.setRollerBottomVolts(0.0);
         } else {
-            io.setRollerTopVolts(0.0);
-            io.setRollerBottomVolts(0.0);
+            // io.setRollerTopVolts(0.0);
+            // io.setRollerBottomVolts(0.0);
         }
         // intakeRunRollers();
     }
