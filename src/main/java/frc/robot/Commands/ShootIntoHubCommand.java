@@ -44,8 +44,8 @@ public class ShootIntoHubCommand extends Command {
 
     @Override
     public void initialize() {
-        drivetrain.odometry.allowTeleportsNextPoseUpdate();
-        drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
+        // drivetrain.odometry.allowTeleportsNextPoseUpdate();
+        // drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
         isShooting = false;
         driveErrorDeg = 9999.0;
     }
@@ -54,9 +54,9 @@ public class ShootIntoHubCommand extends Command {
     public void execute() {
         Double robotDistanceToHub = drivetrain.odometry.getPoseMeters().getTranslation().getDistance(FieldElement.HUB.getPose2d().getTranslation());
         Logger.recordOutput("ShootIntoHubCommand/robotDistanceToHub", robotDistanceToHub);
-        // shooterError = shooter.setShot(velocityMap.get(robotDistanceToHub), angleMap.get(robotDistanceToHub));
-        shooterError = shooter.setShot(    FlyingCircuitUtils.getNumberFromDashboard("desiredVelocityRPS", 20),
-            FlyingCircuitUtils.getNumberFromDashboard("desiredHoodAngleDeg", 30));
+        shooterError = shooter.setShot(velocityMap.get(robotDistanceToHub), angleMap.get(robotDistanceToHub));
+        // shooterError = shooter.setShot(    FlyingCircuitUtils.getNumberFromDashboard("desiredVelocityRPS", 20),
+            // FlyingCircuitUtils.getNumberFromDashboard("desiredHoodAngleDeg", 30));
 
         boolean drivetrainInTolerance = UniversalConstants.drivetrainShotToleranceDeg > Math.abs(driveErrorDeg);
         boolean shotVelocityInTolerance = UniversalConstants.shooterShotRPSTolerance > Math.abs(shooterError.velocityErrorRPS());

@@ -222,7 +222,7 @@ public class Odometry {
              Matrix<N3, N1> stdDevs;
 
             // if we have seen a good enough tag then start using mt2
-            if(!(hasSeenGoodTag) && (tagToCamMeters < 4.0) && (poseAmbiguity < 0.20)) {
+            if(!(hasSeenGoodTag) && (tagToCamMeters < 4.0) && (poseAmbiguity < 0.1)) {
                 hasSeenGoodTag = true;
                 Logger.recordOutput("Odometry/hasSeenGoodTag", hasSeenGoodTag);
                 limelights.setIMUModeNextLoop(3);

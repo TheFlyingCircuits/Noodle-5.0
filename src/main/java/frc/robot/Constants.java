@@ -41,7 +41,7 @@ public final class Constants {
 
         public static final double bumperWidthMeters = Units.inchesToMeters(27 + 7);
 
-        public static final double drivetrainShotToleranceDeg = 2.5;
+        public static final double drivetrainShotToleranceDeg = 1.5;
         public static final double shooterShotRPSTolerance = 0.45;
         public static final double shooterShotTolgeranceDeg = 1.8;
     }
@@ -193,7 +193,7 @@ public final class Constants {
         public static final int pigeonID = 48;
 
         //Follow the mount calibration process in Phoenix Tuner to determine these
-        public static final double mountPoseYawDegrees = 0.0;
+        public static final double mountPoseYawDegrees = 180.0;
         public static final double mountPosePitchDegrees = 0.0;
         public static final double mountPoseRollDegrees = 0.0;
     }
@@ -212,7 +212,7 @@ public final class Constants {
         public static final double velocityKvVoltsPerRPS = (12.0 / (5800.0 / 60.0));
         public static final double simVelocityTimeConstantSeconds = 0.1;
 
-        public static final double shootingIndexingVelocityRPS = 20.0;
+        public static final double shootingIndexingVelocityRPS = 30.0;
 
     }
     
@@ -230,7 +230,7 @@ public final class Constants {
         public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        public static final double shooterVelocityKp = 28.0;
+        public static final double shooterVelocityKp = 20.0;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
         public static final double shooterVelocityKs = 6.5;
@@ -250,15 +250,21 @@ public final class Constants {
         public static final InterpolatingDoubleTreeMap shootingMetersToDegMap = new InterpolatingDoubleTreeMap();
 
         static {
+
+            shootingMetersToRpsMap.put(1.0, 24.0);
+            shootingMetersToDegMap.put(1.0, 17.0);
+            
             shootingMetersToRpsMap.put(2.73413, 26.0);
             shootingMetersToDegMap.put(2.73413, 19.0 );
+
+            shootingMetersToRpsMap.put(3.451033, 28.2);
+            shootingMetersToDegMap.put(3.451033, 23.1);
 
             shootingMetersToRpsMap.put(4.384109, 30.0);
             shootingMetersToDegMap.put(4.384109, 25.0);
 
-            shootingMetersToRpsMap.put(3.451033, 28.2);
-            shootingMetersToDegMap.put(3.451033, 23.1
-             );
+            shootingMetersToRpsMap.put(5.5, 32.0);
+            shootingMetersToDegMap.put(5.5, 27.5);
         }
 
         // TODO: get real diameter this was a rough estimate

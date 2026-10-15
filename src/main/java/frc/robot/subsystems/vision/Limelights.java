@@ -17,7 +17,7 @@ public class Limelights {
         this.camNames=camNames;
         for(String camName : camNames) {
             LimelightHelpers.setPipelineIndex(camName, 0);
-            LimelightHelpers.SetIMUAssistAlpha(camName, 0.05);
+            LimelightHelpers.SetIMUAssistAlpha(camName, 0.01);
         }
     }
 
@@ -44,7 +44,7 @@ public class Limelights {
 
                     SingleTagPoseObservation poseObservation = new SingleTagPoseObservation(
                         camName, new Pose3d(mt2.pose), mt2.timestampSeconds, fiducialsUsed, 
-                            closestTag.distToCamera, 0.0, seesMultibleTags, closestTag.id, robotYawRateRad);
+                            closestTag.distToCamera, 0.0, seesMultibleTags, closestTag.id, Math.abs(robotYawRateRad));
 
                     poseObservations.add(poseObservation);
                 }
@@ -62,7 +62,7 @@ public class Limelights {
 
                     SingleTagPoseObservation poseObservation = new SingleTagPoseObservation(
                         camName, new Pose3d(mt1.pose), mt1.timestampSeconds, fiducialsUsed, 
-                            closestTag.distToCamera, closestTag.ambiguity, seesMultibleTags, closestTag.id, robotYawRateRad);
+                            closestTag.distToCamera, closestTag.ambiguity, seesMultibleTags, closestTag.id, Math.abs(robotYawRateRad));
 
                     poseObservations.add(poseObservation);
                 }

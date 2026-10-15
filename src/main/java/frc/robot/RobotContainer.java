@@ -173,6 +173,7 @@ public class RobotContainer {
     duncanController.b().whileTrue(intake.intakeUpCommand());
     duncanController.a().whileTrue(ShootCommand());
     duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
+    duncanController.y().onTrue(reSeedRobotPose());
     // duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));
   }
 
@@ -206,6 +207,11 @@ public class RobotContainer {
     boolean shouldTargetHub_red = !shouldTargetHub_blue;
     return FlyingCircuitUtils.getAllianceDependentValue(shouldTargetHub_red, shouldTargetHub_blue, true);
   }
+
+  private Command reSeedRobotPose() {return Commands.run(() -> {
+        drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
+        drivetrain.odometry.allowTeleportsNextPoseUpdate();
+    }).until(drivetrain.odometry::seesAcceptableTag).ignoringDisable(true);}
 
   public Command autoPassOrShoot() {
     return new ConditionalCommand(new ShootIntoHubCommand(drivetrain, shooter,indexer,intake), new PassCommand(drivetrain, shooter, indexer, intake), () -> shouldShootIntoHub());
