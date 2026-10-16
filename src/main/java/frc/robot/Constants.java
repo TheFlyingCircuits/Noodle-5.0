@@ -230,7 +230,7 @@ public final class Constants {
         public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        public static final double shooterVelocityKp = 20.0; //this was old and other is bang bang
+        public static final double shooterVelocityKp = 25.0; //this was old and other is bang bang
         // public static final double shooterVelocityKp = 99999.0;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
@@ -267,7 +267,7 @@ public final class Constants {
             shootingMetersToRpsMap.put(2.73413, 25.0);
             shootingMetersToDegMap.put(2.73413, 18.0);
 
-            shootingMetersToRpsMap.put(3.451033, 27.2);
+            shootingMetersToRpsMap.put(3.451033, 27.8);
             shootingMetersToDegMap.put(3.451033, 20.0);
 
             shootingMetersToRpsMap.put(4.384109, 29.5);

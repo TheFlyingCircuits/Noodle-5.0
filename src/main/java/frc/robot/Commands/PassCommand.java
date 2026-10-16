@@ -3,9 +3,6 @@ package frc.robot.Commands;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -13,7 +10,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.UniversalConstants;
 import frc.robot.FlyingCircuitUtils;
 import frc.robot.PlayingField.FieldElement;
@@ -50,8 +46,6 @@ public class PassCommand extends Command {
 
     // private final Transform3d shooterTranslationRobotRelative = new Transform3d(-Units.inchesToMeters(13.5), 0.0, Units.inchesToMeters(21), new Rotation3d());
 
-    // gravity constant
-    private final double g = 9.81;
     private final double sideWaysToleranceMeters = 0.75;
     private boolean isShooting = false;
 
@@ -127,29 +121,6 @@ public class PassCommand extends Command {
         Logger.recordOutput("Passing/Shooter velocityErrorRPS", shooterError.velocityErrorRPS());
         Logger.recordOutput("Passing/Shooter angleErrorDeg", shooterError.angleErrorDeg());
         Logger.recordOutput("Passing/isShooting", isShooting);
-    }
-
-    private FuelTrajectory angleOfAttackTrajCalc(Translation3d targetTranslation, double angleOfAttackDegrees, Translation3d shooterTranslation) {
-        Translation3d targetTranslationTurretRelative = targetTranslation.minus(shooterTranslation);
-
-        double ballDisplacementXYMeters = Math.sqrt(Math.pow(targetTranslationTurretRelative.getX(), 2)
-            + Math.pow(targetTranslationTurretRelative.getY(),2)); // same as math.hypot but I wanted to write it out one time
-
-        // ballDisplacementXYMeters = targetTranslationTurretRelative.toTranslation2d().getNorm(); is easy way
-
-        double ballDisplacementZMeters = targetTranslationTurretRelative.getZ();
-
-        double timeOfImpactSeconds = Math.sqrt(Math.abs((2.0/g)*(ballDisplacementZMeters
-            -ballDisplacementXYMeters*Math.tan(Units.degreesToRadians(angleOfAttackDegrees)))));
-
-        double initialVelocityXYMetersPerSecond = ballDisplacementXYMeters/timeOfImpactSeconds;
-        double initialVelocityZMetersPerSecond = (ballDisplacementZMeters+(0.5*g)*Math.pow(timeOfImpactSeconds,2))/timeOfImpactSeconds;
-        double exitVelocityMetersPerSecond = Math.hypot(initialVelocityXYMetersPerSecond, initialVelocityZMetersPerSecond);
-
-        double launchAngleRadians = Math.atan2(initialVelocityZMetersPerSecond, initialVelocityXYMetersPerSecond);
-        double launchAngleDegrees = Units.radiansToDegrees(launchAngleRadians);
-
-        return new FuelTrajectory(exitVelocityMetersPerSecond, launchAngleDegrees, timeOfImpactSeconds);
     }
 
     public static Translation3d getPassingTargetTranslation(PossibeTargets passingTarget) {

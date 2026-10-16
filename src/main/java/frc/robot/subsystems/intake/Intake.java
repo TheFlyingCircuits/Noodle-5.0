@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("intakeInputs", inputs);
-        isIntakeDown = inputs.intakePositionDegrees < 6.0;
+        isIntakeDown = inputs.intakePositionDegrees < 15.0;
     }
 
     public boolean isIntakeDown() {
@@ -57,13 +57,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeDownThenIntake() {
-        if(inputs.intakePositionDegrees > 6.0) {
+        if(inputs.intakePositionDegrees > 15.0) {
             isIntakeDown = false;
             io.setTargetIntakePositionDegrees(0);
             // reverseIntake();
         } else {
             isIntakeDown = true;
-            if(inputs.intakePositionDegrees < 6.0) {
+            if(inputs.intakePositionDegrees < 15.0) {
                 intakeRunRollers();
             }
             intakeDefault();
@@ -79,20 +79,20 @@ public class Intake extends SubsystemBase {
         io.setTargetIntakePositionDegrees(IntakeConstants.intakeUpDegrees);
     }
 
-    public void zeroIntake() {
-        io.setIntakePositionEncoder(0.0);
+    public void setIntakeDegEncoder(double deg) {
+        io.setIntakePositionEncoder(deg);
     }
 
     public void intakeUpAndIntake() {
         intakeUp();
-        if(inputs.intakePositionDegrees > 6.0) {
+        if(inputs.intakePositionDegrees < 19.0) {
             io.setTargetRollerBottomVelocity(15.0);
             io.setTargetRollerTopVelocity(15.0);
             // io.setRollerTopVolts(0.0);
             // io.setRollerBottomVolts(0.0);
         } else {
-            // io.setRollerTopVolts(0.0);
-            // io.setRollerBottomVolts(0.0);
+            io.setRollerTopVolts(0.0);
+            io.setRollerBottomVolts(0.0);
         }
         // intakeRunRollers();
     }
@@ -120,8 +120,8 @@ public class Intake extends SubsystemBase {
         return this.run(() -> intakeDown());
     }
 
-    public Command zeroIntakeCommand() {
-        return this.run(() -> zeroIntake());
+    public Command zeroIntakeCommand(double angleDeg) {
+        return this.run(() -> setIntakeDegEncoder(angleDeg));
     }
 
 

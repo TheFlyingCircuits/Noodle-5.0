@@ -1,8 +1,9 @@
 package frc.robot.Commands;
 
 import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.FlyingCircuitUtils;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.UniversalConstants;
 import frc.robot.subsystems.indexer.Indexer;
@@ -45,12 +46,21 @@ public class ShootTestCommand extends Command {
     @Override
     public void execute() {
 
+        double before = Timer.getFPGATimestamp();
         shooterError = shooter.setShot(desiredVelocityRPS, desiredHoodAngleDeg);
+        double after = Timer.getFPGATimestamp();
 
+        double errorTime = after - before;
+
+        before = Timer.getFPGATimestamp();
         boolean shotVelocityInTolerance = UniversalConstants.shooterShotRPSTolerance > Math.abs(shooterError.velocityErrorRPS());
         boolean shotAngleInTolerance = UniversalConstants.shooterShotTolgeranceDeg > Math.abs(shooterError.angleErrorDeg());
+        after = Timer.getFPGATimestamp();
 
+        double toleranceTime = after - before;
         // once is shooting is on it does not go off
+
+        before = Timer.getFPGATimestamp();
 
         if (!isShooting) isShooting = shotVelocityInTolerance && shotAngleInTolerance;
 
@@ -63,9 +73,20 @@ public class ShootTestCommand extends Command {
             
         }
 
+        after = Timer.getFPGATimestamp();
+        double ifStatementTime = after - before;
+
+        before = Timer.getFPGATimestamp();
         Logger.recordOutput("ShootIntoHubCommand/isShooting", isShooting);
         Logger.recordOutput("ShootIntoHubCommand/shotVelocityErrorRPS", shooterError.velocityErrorRPS());
         Logger.recordOutput("ShootIntoHubCommand/shotAngleError", shooterError.angleErrorDeg());
+        after = Timer.getFPGATimestamp();
 
+        double loggingTime = after - before;
+
+        Logger.recordOutput("TimerTesting/errorTime", errorTime);
+        Logger.recordOutput("TimerTesting/toleranceTime", toleranceTime);
+        Logger.recordOutput("TimerTesting/ifStatementTime", ifStatementTime);
+        Logger.recordOutput("TimerTesting/loggingTime", loggingTime);
     }
 }

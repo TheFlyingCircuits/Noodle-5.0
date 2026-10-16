@@ -148,8 +148,10 @@ public class RobotContainer {
         new ShootTestCommand(shooter, indexer, intake);
 
         SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
-        pathTimer = new Timer();
+
     }
+
+    pathTimer = new Timer();
 
     candle = new LedsCANdle(45, 8);
 
@@ -170,7 +172,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
         Logger.recordOutput("ShootIntoHubCommand/driveErrorDeg", 0.0);
-        Logger.recordOutput("ShootIntoHubCommand/isShooting", 0.0);
+        Logger.recordOutput("ShootIntoHubCommand/isShooting", false);
         Logger.recordOutput("ShootIntoHubCommand/shotVelocityErrorRPS", 0.0);
         Logger.recordOutput("ShootIntoHubCommand/shotAngleError", 0.0);
         Logger.recordOutput("ShootIntoHubCommand/robotDistanceToHub", 0.0);
@@ -193,7 +195,8 @@ public class RobotContainer {
     duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
     duncanController.y().onTrue(reSeedRobotPose());
 
-    duncanController.povUp().whileTrue(intake.zeroIntakeCommand());
+    duncanController.povUp().whileTrue(intake.zeroIntakeCommand(112.49));
+    duncanController.povDown().whileTrue(intake.zeroIntakeCommand(0.0));
     // duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));
   }
 
@@ -334,10 +337,10 @@ public class RobotContainer {
   public Command trenchShallowAuto() {
     // need to replace Commands.wait with shooting and add intake and stuff
     return new SequentialCommandGroup(
-      followChoreoCheckpointTrajoectory("Example_auto_1", 0.3, 0.1)
+      followChoreoCheckpointTrajoectory("Example_auto_1", 0.4, 0.4)
         .deadlineFor(new ParallelCommandGroup(intakeAndLoadIndexer(), shooter.shooterDefualtCommand())),
       autoPassOrShoot().withTimeout(3.5),
-      followChoreoCheckpointTrajoectory("Example_auto_p2", 0.3, 0.1)
+      followChoreoCheckpointTrajoectory("Example_auto_p2", 0.4, 0.4)
         .deadlineFor(new ParallelCommandGroup(intakeAndLoadIndexer(), shooter.shooterDefualtCommand())),
       autoPassOrShoot()
     );

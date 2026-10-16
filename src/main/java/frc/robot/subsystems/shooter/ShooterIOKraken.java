@@ -31,6 +31,7 @@ public class ShooterIOKraken implements ShooterIO {
 
     private TalonFXConfiguration drumConfig;
     private TalonFXConfiguration pivotConfig;
+    private VelocityTorqueCurrentFOC torqueCurrent = new VelocityTorqueCurrentFOC(0.0);
 
     public ShooterIOKraken() {
         drumConfig = new TalonFXConfiguration();
@@ -107,10 +108,10 @@ public class ShooterIOKraken implements ShooterIO {
 
     @Override
     public void setShooterVelocity(double shooterVelocityRPS) {
-        shooterTL.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
-        shooterBL.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
-        shooterTR.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
-        shooterBR.setControl(new VelocityTorqueCurrentFOC(RotationsPerSecond.of(shooterVelocityRPS)));
+        shooterTL.setControl(torqueCurrent.withVelocity(shooterVelocityRPS));
+        shooterBL.setControl(torqueCurrent.withVelocity(shooterVelocityRPS));
+        shooterTR.setControl(torqueCurrent.withVelocity(shooterVelocityRPS));
+        shooterBR.setControl(torqueCurrent.withVelocity(shooterVelocityRPS));
     }
 
     @Override

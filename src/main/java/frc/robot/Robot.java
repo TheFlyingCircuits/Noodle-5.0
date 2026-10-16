@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.shooter.ShooterError;
 
 public class Robot extends LoggedRobot  {
   private Command m_autonomousCommand;
@@ -85,6 +86,7 @@ public void simulationPeriod() {
   public void disabledInit() {
     Command dummyCOmmand = m_robotContainer.ShootCommand();
     CommandScheduler.getInstance().schedule(dummyCOmmand);
+    ShooterError shooterError = new ShooterError(9999.0, 9999.0);
   }
 
   @Override
@@ -92,6 +94,8 @@ public void simulationPeriod() {
     m_robotContainer.setPoseToAutoStart();
     m_robotContainer.drivetrain.odometry.allowTeleportsNextPoseUpdate();
     m_robotContainer.drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
+
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
   }
 
   @Override
@@ -99,7 +103,7 @@ public void simulationPeriod() {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);

@@ -17,7 +17,7 @@ public class Limelights {
         this.camNames=camNames;
         for(String camName : camNames) {
             LimelightHelpers.setPipelineIndex(camName, 0);
-            LimelightHelpers.SetIMUAssistAlpha(camName, 0.05);
+            LimelightHelpers.SetIMUAssistAlpha(camName, 0.06);
         }
     }
 

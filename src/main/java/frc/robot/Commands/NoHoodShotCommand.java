@@ -2,7 +2,6 @@ package frc.robot.Commands;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.FlyingCircuitUtils;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.UniversalConstants;
 import frc.robot.subsystems.indexer.Indexer;
