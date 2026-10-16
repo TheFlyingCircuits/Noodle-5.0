@@ -89,6 +89,7 @@ public void simulationPeriod() {
 
   @Override
   public void disabledPeriodic() {
+    m_robotContainer.setPoseToAutoStart();
     m_robotContainer.drivetrain.odometry.allowTeleportsNextPoseUpdate();
     m_robotContainer.drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
   }

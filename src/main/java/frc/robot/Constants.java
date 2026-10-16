@@ -270,10 +270,10 @@ public final class Constants {
             shootingMetersToRpsMap.put(3.451033, 27.2);
             shootingMetersToDegMap.put(3.451033, 20.0);
 
-            shootingMetersToRpsMap.put(4.384109, 30.0);
+            shootingMetersToRpsMap.put(4.384109, 29.5);
             shootingMetersToDegMap.put(4.384109, 24.0);
 
-            shootingMetersToRpsMap.put(5.5, 32.0);
+            shootingMetersToRpsMap.put(5.5, 31.5);
             shootingMetersToDegMap.put(5.5, 25.5);
 
             shootingMetersToRpsMap.put(7.0, 35.5);

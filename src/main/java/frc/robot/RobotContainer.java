@@ -312,7 +312,7 @@ public class RobotContainer {
 
   /** Called by Robot.java, convenience function for logging. */
   public void periodic() {
-    if(DriverStation.isDisabled()) setPoseToAutoStart();
+    // if(DriverStation.isDisabled()) setPoseToAutoStart();
     // if in sim set fused pose to maple sim pose and log it
     if(RobotBase.isSimulation()) {
       drivetrain.odometry.setPoseMeters(swerveDriveSimulation.getSimulatedDriveTrainPose());
