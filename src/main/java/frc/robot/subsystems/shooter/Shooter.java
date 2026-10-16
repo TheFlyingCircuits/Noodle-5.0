@@ -22,13 +22,6 @@ public class Shooter extends SubsystemBase {
         FlyingCircuitUtils.putNumberOnDashboard("hood volts", 0.0);
     }
 
-    /**
-     * This record is used to store the error for the shooter components.
-     * @param velocityErrorRPS The error of the drum shooter velocity in RPS from target-current.
-     * @param angleErrorDeg The error of the pivot in degrees from target-current.
-     */
-    public record ShooterError(double velocityErrorRPS, double angleErrorDeg) {};
-
     @Override
     public void periodic() {
         io.updateInputs(inputs);

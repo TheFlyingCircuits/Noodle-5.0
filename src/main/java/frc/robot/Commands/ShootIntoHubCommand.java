@@ -14,7 +14,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.ShooterError;
+import frc.robot.subsystems.shooter.ShooterError;
 
 public class ShootIntoHubCommand extends Command {
 
@@ -26,7 +26,7 @@ public class ShootIntoHubCommand extends Command {
 
     private boolean isShooting = false;
     private Double driveErrorDeg = 9999.0;
-    private ShooterError shooterError = new ShooterError(9999.0, 9999.0);
+    private ShooterError shooterError;
 
     private InterpolatingDoubleTreeMap velocityMap = Constants.ShooterConstants.shootingMetersToRpsMap;
     private InterpolatingDoubleTreeMap angleMap = Constants.ShooterConstants.shootingMetersToDegMap;
@@ -39,6 +39,8 @@ public class ShootIntoHubCommand extends Command {
         this.indexer = indexer;
         this.intake = intake;
 
+        shooterError = new ShooterError(9999.0, 9999.0);
+
         addRequirements(drivetrain, shooter,indexer,intake);
     }
 
@@ -48,6 +50,7 @@ public class ShootIntoHubCommand extends Command {
         // drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
         isShooting = false;
         driveErrorDeg = 9999.0;
+        shooterError = new ShooterError(9999.0, 9999.0);
     }
 
     @Override

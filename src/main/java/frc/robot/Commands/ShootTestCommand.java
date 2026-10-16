@@ -8,7 +8,7 @@ import frc.robot.Constants.UniversalConstants;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.ShooterError;
+import frc.robot.subsystems.shooter.ShooterError;
 
 public class ShootTestCommand extends Command {
 
@@ -29,6 +29,7 @@ public class ShootTestCommand extends Command {
         this.shooter = shooter;
         this.indexer = indexer;
         this.intake = intake;
+        shooterError = new ShooterError(9999.0, 9999.0);
 
         addRequirements(shooter,indexer,intake);
     }

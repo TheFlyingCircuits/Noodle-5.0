@@ -60,7 +60,7 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIOKraken;
 import frc.robot.subsystems.shooter.ShooterIOSim;
-import frc.robot.subsystems.shooter.Shooter.ShooterError;
+import frc.robot.subsystems.shooter.ShooterError;
 
 public class RobotContainer {
 

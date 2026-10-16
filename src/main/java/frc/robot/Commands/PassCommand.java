@@ -21,7 +21,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.ShooterError;
+import frc.robot.subsystems.shooter.ShooterError;
 
 public class PassCommand extends Command {
 
