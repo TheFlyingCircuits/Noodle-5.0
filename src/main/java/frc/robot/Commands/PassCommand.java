@@ -8,8 +8,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.UniversalConstants;
@@ -46,12 +48,15 @@ public class PassCommand extends Command {
     private final Indexer indexer;
     private final Intake intake;
 
-    private final Transform3d shooterTranslationRobotRelative = new Transform3d(-Units.inchesToMeters(13.5), 0.0, Units.inchesToMeters(21), new Rotation3d());
+    // private final Transform3d shooterTranslationRobotRelative = new Transform3d(-Units.inchesToMeters(13.5), 0.0, Units.inchesToMeters(21), new Rotation3d());
 
     // gravity constant
     private final double g = 9.81;
     private final double sideWaysToleranceMeters = 0.75;
     private boolean isShooting = false;
+
+    private InterpolatingDoubleTreeMap velocityMap = Constants.ShooterConstants.passingMetersToRpsMap;
+    private InterpolatingDoubleTreeMap angleMap = Constants.ShooterConstants.passingMetersToDegMap;
 
     private double driveErrorDeg = 9999.0;
 
@@ -79,17 +84,19 @@ public class PassCommand extends Command {
         updateShootingTarget(robotTranslation);
         Translation3d passingTargetTranslation = getPassingTargetTranslation(shootingTarget);
 
+        Double robotDistanceToTarget = robotTranslation.getDistance(passingTargetTranslation.toTranslation2d());
 
-        Translation3d shooterTranslationFieldRelative = new Pose3d(robotPose).plus(shooterTranslationRobotRelative).getTranslation();
-        Logger.recordOutput("Shooter translation" ,shooterTranslationFieldRelative);
 
-        FuelTrajectory targetFuelTrajectory = angleOfAttackTrajCalc(passingTargetTranslation, 45.0, shooterTranslationFieldRelative);
+        // Translation3d shooterTranslationFieldRelative = new Pose3d(robotPose).plus(shooterTranslationRobotRelative).getTranslation();
+        // Logger.recordOutput("Shooter translation" ,shooterTranslationFieldRelative);
+
+        // FuelTrajectory targetFuelTrajectory = angleOfAttackTrajCalc(passingTargetTranslation, 45.0, shooterTranslationFieldRelative);
 
         // convert meters per second of fuel output to rps of our drum, 60 sec *(m/s / pi*diamter)
-        final double targetVelocityRPS = 60.0 * (targetFuelTrajectory.exitVelocityMPS / (Math.PI*ShooterConstants.drumDiameterMeters));
+        // final double targetVelocityRPS = 60.0 * (targetFuelTrajectory.exitVelocityMPS / (Math.PI*ShooterConstants.drumDiameterMeters));
 
         // gets the shooter to spin a target RPS and the pivot to aim at target angle, this also returns the shooter error record.
-        final ShooterError shooterError = shooter.setShot(targetVelocityRPS, targetFuelTrajectory.exitAngleDeg);
+        final ShooterError shooterError = shooter.setShot(velocityMap.get(robotDistanceToTarget), angleMap.get(robotDistanceToTarget));
         Logger.recordOutput("Passing target", passingTargetTranslation);
 
         if(!isShooting) {
@@ -116,6 +123,7 @@ public class PassCommand extends Command {
 
         // logs the errors
         Logger.recordOutput("Passing/Drivetrain errorDeg", driveErrorDeg);
+        Logger.recordOutput("Passing/Distance to target m", robotDistanceToTarget);
         Logger.recordOutput("Passing/Shooter velocityErrorRPS", shooterError.velocityErrorRPS());
         Logger.recordOutput("Passing/Shooter angleErrorDeg", shooterError.angleErrorDeg());
         Logger.recordOutput("Passing/isShooting", isShooting);

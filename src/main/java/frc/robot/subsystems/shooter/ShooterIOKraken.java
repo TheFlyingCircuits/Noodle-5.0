@@ -79,7 +79,7 @@ public class ShooterIOKraken implements ShooterIO {
         pivotConfig.CurrentLimits.StatorCurrentLimit = Constants.ShooterConstants.pivotCurrentLimitAmps;
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-        pivotConfig.Slot0.kS = Constants.ShooterConstants.pivotKs;
+        pivotConfig.Slot0.kS = 0.4;
         pivotConfig.Slot0.kP = Constants.ShooterConstants.pivotKp;
 
         // TODO: this is fake gear ratio because it will prob not be 1:1
@@ -121,7 +121,7 @@ public class ShooterIOKraken implements ShooterIO {
     @Override
     public void setPivotAngle(double targetAngleDegrees) {
         targetAngleDegrees = MathUtil.clamp(targetAngleDegrees, ShooterConstants.hoodMinAngleDeg, ShooterConstants.hoodMaxAngleDeg);
-        pivot.setControl(new PositionVoltage(Units.degreesToRotations(targetAngleDegrees)));
+        pivot.setControl(new PositionVoltage(Units.degreesToRotations(targetAngleDegrees)).withFeedForward(0.6));
     }
 
     @Override

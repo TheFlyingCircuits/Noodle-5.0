@@ -60,6 +60,7 @@ import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIOKraken;
 import frc.robot.subsystems.shooter.ShooterIOSim;
+import frc.robot.subsystems.shooter.Shooter.ShooterError;
 
 public class RobotContainer {
 
@@ -150,6 +151,9 @@ public class RobotContainer {
 
     candle = new LedsCANdle(45, 8);
 
+    System.out.println("Loading ShootTestCommand class: " + ShootTestCommand.class.getName());
+    System.out.println("Init test shooter error deg " + new ShooterError(0.0,0.0).angleErrorDeg());
+
     
     FlyingCircuitUtils.putNumberOnDashboard("desiredHoodAngleDeg", 30);
     FlyingCircuitUtils.putNumberOnDashboard("desiredVelocityRPS", 20);
@@ -171,7 +175,7 @@ public class RobotContainer {
 
     duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
     duncanController.b().whileTrue(intake.intakeUpCommand());
-    duncanController.a().whileTrue(ShootCommand());
+    duncanController.a().whileTrue(new ShootTestCommand(shooter, indexer, intake));
     duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
     duncanController.y().onTrue(reSeedRobotPose());
     // duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));

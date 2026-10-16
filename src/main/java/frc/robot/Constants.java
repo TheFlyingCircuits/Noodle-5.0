@@ -193,7 +193,7 @@ public final class Constants {
         public static final int pigeonID = 48;
 
         //Follow the mount calibration process in Phoenix Tuner to determine these
-        public static final double mountPoseYawDegrees = 180.0;
+        public static final double mountPoseYawDegrees = 0.0;
         public static final double mountPosePitchDegrees = 0.0;
         public static final double mountPoseRollDegrees = 0.0;
     }
@@ -250,7 +250,16 @@ public final class Constants {
         public static final InterpolatingDoubleTreeMap shootingMetersToRpsMap = new InterpolatingDoubleTreeMap();
         public static final InterpolatingDoubleTreeMap shootingMetersToDegMap = new InterpolatingDoubleTreeMap();
 
+        // lookup table
+        public static final InterpolatingDoubleTreeMap passingMetersToRpsMap = new InterpolatingDoubleTreeMap();
+        public static final InterpolatingDoubleTreeMap passingMetersToDegMap = new InterpolatingDoubleTreeMap();
+
+        // 43.5 is max rps
+
         static {
+            
+            shootingMetersToRpsMap.put(0.5, 20.0);
+            shootingMetersToDegMap.put(0.5, 13.0);
 
             shootingMetersToRpsMap.put(1.0, 24.0);
             shootingMetersToDegMap.put(1.0, 17.0);
@@ -266,6 +275,30 @@ public final class Constants {
 
             shootingMetersToRpsMap.put(5.5, 32.0);
             shootingMetersToDegMap.put(5.5, 27.5);
+
+            shootingMetersToRpsMap.put(7.0, 34.5);
+            shootingMetersToDegMap.put(7.0, 31.0);
+        }
+
+        static {
+
+            passingMetersToRpsMap.put(1.0, 18.0);
+            shootingMetersToDegMap.put(1.0, 28.0);
+            
+            passingMetersToRpsMap.put(2.73413, 26.0);
+            shootingMetersToDegMap.put(2.73413, 30.0 );
+
+            passingMetersToRpsMap.put(3.451033, 28.2);
+            shootingMetersToDegMap.put(3.451033, 32.0);
+
+            passingMetersToRpsMap.put(4.384109, 31.0);
+            shootingMetersToDegMap.put(4.384109, 35.0);
+
+            passingMetersToRpsMap.put(5.5, 34.0);
+            shootingMetersToDegMap.put(5.5, 37.0);
+
+            passingMetersToRpsMap.put(7.0, 38.0);
+            shootingMetersToDegMap.put(7.0, 41.0);
         }
 
         // TODO: get real diameter this was a rough estimate
