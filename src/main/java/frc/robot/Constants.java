@@ -282,22 +282,22 @@ public final class Constants {
 
         static {
 
-            passingMetersToRpsMap.put(1.0, 18.0);
+            passingMetersToRpsMap.put(1.0, 16.0);
             passingMetersToDegMap.put(1.0, 28.0);
             
-            passingMetersToRpsMap.put(2.73413, 26.0);
+            passingMetersToRpsMap.put(2.73413, 22.0);
             passingMetersToDegMap.put(2.73413, 30.0 );
 
-            passingMetersToRpsMap.put(3.451033, 26.2);
+            passingMetersToRpsMap.put(3.451033, 24.2);
             passingMetersToDegMap.put(3.451033, 32.0);
 
-            passingMetersToRpsMap.put(4.384109, 31.0);
+            passingMetersToRpsMap.put(4.384109, 29.0);
             passingMetersToDegMap.put(4.384109, 35.0);
 
-            passingMetersToRpsMap.put(5.5, 34.0);
+            passingMetersToRpsMap.put(5.5, 32.0);
             passingMetersToDegMap.put(5.5, 37.0);
 
-            passingMetersToRpsMap.put(7.0, 38.0);
+            passingMetersToRpsMap.put(7.0, 36.0);
             passingMetersToDegMap.put(7.0, 41.0);
         }
 

@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.NoHoodShotCommand;
 import frc.robot.Commands.PassCommand;
 import frc.robot.Commands.ShootIntoHubCommand;
 import frc.robot.Commands.ShootTestCommand;
@@ -183,11 +184,16 @@ public class RobotContainer {
     duncanController.rightBumper().whileTrue(autoPassOrShoot());
 
     duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
+    duncanController.rightTrigger().whileTrue(intake.reverseIntakeCommand().alongWith(indexer.setIndexerVelocityCommand(-20.0)));
+
     duncanController.b().whileTrue(intake.intakeUpCommand());
     duncanController.a().whileTrue(new ShootTestCommand(shooter, indexer, intake));
+    duncanController.x().whileTrue(new NoHoodShotCommand(shooter, indexer, intake));
+
     duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
     duncanController.y().onTrue(reSeedRobotPose());
-    duncanController.x().whileTrue(intake.zeroIntakeCommand());
+
+    duncanController.povUp().whileTrue(intake.zeroIntakeCommand());
     // duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));
   }
 
