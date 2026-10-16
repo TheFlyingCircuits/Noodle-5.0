@@ -55,15 +55,15 @@ public class Indexer extends SubsystemBase {
     public void setIndexerVelocity(double targetRPS) {
         double measuredRPS = inputs.indexerVelocity;
         double feedforwardVolts = velocityFeedforward.calculate(targetRPS);
-        // double feedbackVolts = velocityPID.calculate(measuredRPS, targetRPS);
+        double feedbackVolts = velocityPID.calculate(measuredRPS, targetRPS);
 
-        // bang bang
-        double feedbackVolts = 0;
-        if((targetRPS - measuredRPS) > 1.0) {
-            feedbackVolts = 99;
-        }
+        // // bang bang
+        // double feedbackVolts = 0;
+        // if((targetRPS - measuredRPS) > 0.0) {
+        //     feedbackVolts = 999;
+        // }
 
-        double outputVolts = MathUtil.clamp(feedforwardVolts + feedbackVolts, -9.5, 9.5);
+        double outputVolts = MathUtil.clamp(feedforwardVolts + feedbackVolts, -9, 9);
         io.setIndexerVolts(outputVolts);
     }
 

@@ -79,6 +79,10 @@ public class Intake extends SubsystemBase {
         io.setTargetIntakePositionDegrees(IntakeConstants.intakeUpDegrees);
     }
 
+    public void zeroIntake() {
+        io.setIntakePositionEncoder(0.0);
+    }
+
     public void intakeUpAndIntake() {
         intakeUp();
         if(inputs.intakePositionDegrees > 6.0) {
@@ -115,6 +119,12 @@ public class Intake extends SubsystemBase {
     public Command intakeDownCommand() {
         return this.run(() -> intakeDown());
     }
+
+    public Command zeroIntakeCommand() {
+        return this.run(() -> zeroIntake());
+    }
+
+
     
     public Command intakeUpCommand() {
         return this.run(() -> intakeUp());

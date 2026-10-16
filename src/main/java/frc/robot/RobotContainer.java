@@ -144,6 +144,7 @@ public class RobotContainer {
         indexer = new Indexer(new IndexerIOSim());
         shooter = new Shooter(new ShooterIOSim());
         intake = new Intake(new IntakeIOSim(drivetrain));
+        new ShootTestCommand(shooter, indexer, intake);
 
         SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
         pathTimer = new Timer();
@@ -152,6 +153,8 @@ public class RobotContainer {
     candle = new LedsCANdle(45, 8);
 
     System.out.println("Loading ShootTestCommand class: " + ShootTestCommand.class.getName());
+    System.out.println("Loading Shooting class: " + ShootIntoHubCommand.class.getName());
+    System.out.println("Loading Pass class: " + PassCommand.class.getName());
     System.out.println("Init test shooter error deg " + new ShooterError(0.0,0.0).angleErrorDeg());
 
     
@@ -164,6 +167,12 @@ public class RobotContainer {
     
     autoChooser.setDefaultOption("Left_Trench_Auto", "Left");
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        Logger.recordOutput("ShootIntoHubCommand/driveErrorDeg", 0.0);
+        Logger.recordOutput("ShootIntoHubCommand/isShooting", 0.0);
+        Logger.recordOutput("ShootIntoHubCommand/shotVelocityErrorRPS", 0.0);
+        Logger.recordOutput("ShootIntoHubCommand/shotAngleError", 0.0);
+        Logger.recordOutput("ShootIntoHubCommand/robotDistanceToHub", 0.0);
 
     duncanController = duncan.getXboxController();
     configureBindings();
@@ -178,6 +187,7 @@ public class RobotContainer {
     duncanController.a().whileTrue(new ShootTestCommand(shooter, indexer, intake));
     duncanController.start().onTrue(new InstantCommand(() -> drivetrain.odometry.setRobotFacingForward()));
     duncanController.y().onTrue(reSeedRobotPose());
+    duncanController.x().whileTrue(intake.zeroIntakeCommand());
     // duncanController.a().whileTrue(indexer.setIndexerVelocityCommand(7));
   }
 

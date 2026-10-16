@@ -106,6 +106,10 @@ public class IntakeIOMotors implements IntakeIO{
         rollerTopKraken.setControl(velocityRequest.withVelocity(velocityRPS));
     }
 
+    public void setIntakePositionEncoder(double degrees) {
+        pivotNeo.getEncoder().setPosition(degrees);
+    }
+
     @Override
     public void setTargetRollerBottomVelocity(double velocityRPS) {
         rollerBottomKraken.setControl(velocityRequest.withVelocity(velocityRPS));

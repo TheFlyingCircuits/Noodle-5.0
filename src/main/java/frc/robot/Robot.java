@@ -11,6 +11,9 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.SignalLogger;
+import com.revrobotics.util.StatusLogger;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -33,9 +36,14 @@ public class Robot extends LoggedRobot  {
     }
 
     initAdvantageKit();
+    SignalLogger.enableAutoLogging(false);
+
+    StatusLogger.disableAutoLogging();
     m_robotContainer = new RobotContainer();
 
     DriverStation.silenceJoystickConnectionWarning(true);
+    SignalLogger.enableAutoLogging(false);
+    SignalLogger.stop();
   }
 
   private void initAdvantageKit() {
@@ -57,11 +65,11 @@ public class Robot extends LoggedRobot  {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_robotContainer.periodic();
+    // m_robotContainer.periodic();
 
-    if(RobotBase.isSimulation()) {
-      simulationPeriod();
-    }
+    // if(RobotBase.isSimulation()) {
+    //   simulationPeriod();
+    // }
   }
 
 public void simulationPeriod() {
@@ -74,7 +82,10 @@ public void simulationPeriod() {
 }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    Command dummyCOmmand = m_robotContainer.ShootCommand();
+    CommandScheduler.getInstance().schedule(dummyCOmmand);
+  }
 
   @Override
   public void disabledPeriodic() {

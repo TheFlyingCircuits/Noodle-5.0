@@ -37,4 +37,5 @@ public interface IntakeIO {
    public default void setTargetRollerBottomVelocity(double velocityRPS) {};
 
    public default void setTargetIntakePositionDegrees(double degrees) {};
+   public default void setIntakePositionEncoder(double degrees) {};
 }

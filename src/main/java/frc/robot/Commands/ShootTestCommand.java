@@ -37,8 +37,8 @@ public class ShootTestCommand extends Command {
     @Override
     public void initialize() {
         isShooting = false;
-        desiredHoodAngleDeg = 30.0;
-        desiredVelocityRPS = 20.0;
+        desiredHoodAngleDeg =  20.5;
+        desiredVelocityRPS =  28.2;
         shooterError = new ShooterError(9999.0, 9999.0);
     }
 

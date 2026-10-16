@@ -41,9 +41,9 @@ public final class Constants {
 
         public static final double bumperWidthMeters = Units.inchesToMeters(27 + 7);
 
-        public static final double drivetrainShotToleranceDeg = 1.5;
-        public static final double shooterShotRPSTolerance = 1.0;
-        public static final double shooterShotTolgeranceDeg = 1.8;
+        public static final double drivetrainShotToleranceDeg = 0.9;
+        public static final double shooterShotRPSTolerance = 0.5;
+        public static final double shooterShotTolgeranceDeg = 0.9;
     }
 
     public final static class ControllerConstants {
@@ -204,7 +204,7 @@ public final class Constants {
         public static final int indexerBLId = 4;
         public static final int indexerBRId = 2;
 
-        public static final double velocityKpVoltsPerRPS = 0.1; // was 0.2
+        public static final double velocityKpVoltsPerRPS = 0.15; // was 0.2
         public static final double velocityKiVoltsPerRPSSecond = 0.0;
         public static final double velocityKdVoltsPerRPSPerSecond = 0.0;
 
@@ -212,7 +212,7 @@ public final class Constants {
         public static final double velocityKvVoltsPerRPS = (12.0 / (5800.0 / 60.0));
         public static final double simVelocityTimeConstantSeconds = 0.1;
 
-        public static final double shootingIndexingVelocityRPS = 20.0;
+        public static final double shootingIndexingVelocityRPS = 15.0;
 
     }
     
@@ -230,8 +230,8 @@ public final class Constants {
         public static final double pivotCurrentLimitAmps = 80.0;
 
         // Shooter wheel velocity PID + feedforward tuning
-        // public static final double shooterVelocityKp = 20.0; this was old and other is bang bang
-        public static final double shooterVelocityKp = 99999.0;
+        public static final double shooterVelocityKp = 20.0; //this was old and other is bang bang
+        // public static final double shooterVelocityKp = 99999.0;
         public static final double shooterVelocityKi = 0.0;
         public static final double shooterVelocityKd = 0.0;
         public static final double shooterVelocityKs = 6.4;
@@ -261,44 +261,44 @@ public final class Constants {
             shootingMetersToRpsMap.put(0.5, 20.0);
             shootingMetersToDegMap.put(0.5, 13.0);
 
-            shootingMetersToRpsMap.put(1.0, 24.0);
-            shootingMetersToDegMap.put(1.0, 17.0);
+           shootingMetersToRpsMap.put(1.0, 23.0);
+            shootingMetersToDegMap.put(1.0, 16.0);
             
-            shootingMetersToRpsMap.put(2.73413, 26.0);
-            shootingMetersToDegMap.put(2.73413, 19.0 );
+            shootingMetersToRpsMap.put(2.73413, 25.0);
+            shootingMetersToDegMap.put(2.73413, 18.0);
 
-            shootingMetersToRpsMap.put(3.451033, 28.2);
-            shootingMetersToDegMap.put(3.451033, 23.1);
+            shootingMetersToRpsMap.put(3.451033, 27.2);
+            shootingMetersToDegMap.put(3.451033, 20.0);
 
             shootingMetersToRpsMap.put(4.384109, 30.0);
-            shootingMetersToDegMap.put(4.384109, 25.0);
+            shootingMetersToDegMap.put(4.384109, 24.0);
 
             shootingMetersToRpsMap.put(5.5, 32.0);
-            shootingMetersToDegMap.put(5.5, 27.5);
+            shootingMetersToDegMap.put(5.5, 25.5);
 
-            shootingMetersToRpsMap.put(7.0, 34.5);
-            shootingMetersToDegMap.put(7.0, 31.0);
+            shootingMetersToRpsMap.put(7.0, 35.5);
+            shootingMetersToDegMap.put(7.0, 29.0);
         }
 
         static {
 
             passingMetersToRpsMap.put(1.0, 18.0);
-            shootingMetersToDegMap.put(1.0, 28.0);
+            passingMetersToDegMap.put(1.0, 28.0);
             
             passingMetersToRpsMap.put(2.73413, 26.0);
-            shootingMetersToDegMap.put(2.73413, 30.0 );
+            passingMetersToDegMap.put(2.73413, 30.0 );
 
-            passingMetersToRpsMap.put(3.451033, 28.2);
-            shootingMetersToDegMap.put(3.451033, 32.0);
+            passingMetersToRpsMap.put(3.451033, 26.2);
+            passingMetersToDegMap.put(3.451033, 32.0);
 
             passingMetersToRpsMap.put(4.384109, 31.0);
-            shootingMetersToDegMap.put(4.384109, 35.0);
+            passingMetersToDegMap.put(4.384109, 35.0);
 
             passingMetersToRpsMap.put(5.5, 34.0);
-            shootingMetersToDegMap.put(5.5, 37.0);
+            passingMetersToDegMap.put(5.5, 37.0);
 
             passingMetersToRpsMap.put(7.0, 38.0);
-            shootingMetersToDegMap.put(7.0, 41.0);
+            passingMetersToDegMap.put(7.0, 41.0);
         }
 
         // TODO: get real diameter this was a rough estimate
@@ -310,10 +310,10 @@ public final class Constants {
         public static final int pivotNeoID = 5;
         public static final int rollerTopKrakenID = 9;
         public static final int rollerBottomKrakenID = 10;
-        public static final double kP = 0.09;
+        public static final double kP = 0.084;
         public static final double kS = 0.7;
 
-        public static final double intakeStartDegrees = 108.49; 
+        public static final double intakeStartDegrees = 112.49; 
 
         // this is used for manually moving intake up and also used while shooting
         public static final double intakeUpDegrees = intakeStartDegrees;

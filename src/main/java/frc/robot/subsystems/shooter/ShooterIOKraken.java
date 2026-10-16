@@ -121,7 +121,7 @@ public class ShooterIOKraken implements ShooterIO {
     @Override
     public void setPivotAngle(double targetAngleDegrees) {
         targetAngleDegrees = MathUtil.clamp(targetAngleDegrees, ShooterConstants.hoodMinAngleDeg, ShooterConstants.hoodMaxAngleDeg);
-        pivot.setControl(new PositionVoltage(Units.degreesToRotations(targetAngleDegrees)).withFeedForward(0.6));
+        pivot.setControl(new PositionVoltage(Units.degreesToRotations(targetAngleDegrees)).withFeedForward(0.4));
     }
 
     @Override
