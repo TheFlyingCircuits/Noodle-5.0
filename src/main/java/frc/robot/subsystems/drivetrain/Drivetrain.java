@@ -31,8 +31,8 @@ public class Drivetrain extends SubsystemBase {
 
     public Odometry odometry;
 
-    private final PIDController xController = new PIDController(5.5, 0.1, 0.0);
-    private final PIDController yController = new PIDController(5.5, 0.1, 0.0);
+    private final PIDController xController = new PIDController(6, 0.1, 0.0);
+    private final PIDController yController = new PIDController(6, 0.1, 0.0);
     private final PIDController headingController = new PIDController(10.0, 0.0, 0.0);
     private final PIDController headingControllerAiming = new PIDController(10.0, 0.0, 0.0);
 
@@ -218,9 +218,9 @@ public class Drivetrain extends SubsystemBase {
 
             // use 50% of feed forward to less fight the pid if the pose is really off
             velocities = new ChassisSpeeds(
-                sample.vx*0.5 + xController.calculate(currentPose.getX(), sample.x),
-                sample.vy*0.5 + yController.calculate(currentPose.getY(), sample.y),
-                sample.omega*0.5 + headingController.calculate(currentPose.getRotation().getRadians(), sample.heading)
+                sample.vx*0.0 + xController.calculate(currentPose.getX(), sample.x),
+                sample.vy*0.0 + yController.calculate(currentPose.getY(), sample.y),
+                sample.omega*0.0 + headingController.calculate(currentPose.getRotation().getRadians(), sample.heading)
             );
         } else {
 

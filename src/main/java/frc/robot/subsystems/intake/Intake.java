@@ -47,7 +47,7 @@ public class Intake extends SubsystemBase {
 
     public void intakeDown() {
         intakeRollersStop();
-        if(inputs.intakePositionDegrees > 6.0) {
+        if(inputs.intakePositionDegrees > 15.0) {
             isIntakeDown = false;
             io.setTargetIntakePositionDegrees(0); 
         } else {
@@ -68,9 +68,10 @@ public class Intake extends SubsystemBase {
 
         io.setTargetIntakePositionDegrees(0);
 
-        if(inputs.intakePositionDegrees < 40.0) {
-            intakeRunRollers();
-        }
+        // if(inputs.intakePositionDegrees < 40.0) {
+            
+        // }
+        intakeRunRollers();
     }
 
     public void intakeDefualtAndIntake() {

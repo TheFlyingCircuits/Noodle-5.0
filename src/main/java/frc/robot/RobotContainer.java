@@ -255,9 +255,10 @@ public class RobotContainer {
     if(optionalTrajectory.isEmpty()) return Commands.print("path does not exist returning.");
 
     // gets alliance value and sees if mirrors path so robot follows correct path
-    final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+    boolean isRedAlliance = FlyingCircuitUtils.getAllianceDependentValue(true, false, false);
 
     boolean shouldMirror = isOnRightSideField();
+
     Trajectory<SwerveSample> trajectory = shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
     
     // restarts path timer to 0 for path following
@@ -275,9 +276,10 @@ public class RobotContainer {
     if(optionalTrajectory.isEmpty()) return Commands.print("path does not exist returning.");
 
     // gets alliance value and sees if mirrors path so robot follows correct path
-    final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+    boolean isRedAlliance = FlyingCircuitUtils.getAllianceDependentValue(true, false, false);
 
     boolean shouldMirror = isOnRightSideField();
+    if(isRedAlliance) shouldMirror = !shouldMirror;
     Trajectory<SwerveSample> trajectory = !shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
     
     // restarts path timer to 0 for path following
@@ -285,7 +287,7 @@ public class RobotContainer {
     return new SequentialCommandGroup(
       new InstantCommand(() -> pathTimer.restart()),
       drivetrain.run(() -> {drivetrain.followCheckpointsTrajectory(trajectory, pathTimer, isRedAlliance, toleranceMeters);})
-        .until(() -> drivetrain.isAtEndOfTrajectory(toleranceMeters, velocityToleranceMPS, pathTimer.get(), trajectory.getFinalSample(isRedAlliance).get()))
+        .until(() -> drivetrain.isAtEndOfTrajectory(0.25, 0.15, pathTimer.get(), trajectory.getFinalSample(isRedAlliance).get()))
     );
   }
 
@@ -300,7 +302,7 @@ public class RobotContainer {
       // if(optionalTrajectory.isEmpty()) return;
 
       // gets alliance value and sees if mirrors path so robot follows correct path
-      final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
+      boolean isRedAlliance = FlyingCircuitUtils.getAllianceDependentValue(true, false, false);
 
       boolean shouldMirror = !isOnRightSideField();
       Trajectory<SwerveSample> trajectory = shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
@@ -337,10 +339,10 @@ public class RobotContainer {
   public Command trenchShallowAuto() {
     // need to replace Commands.wait with shooting and add intake and stuff
     return new SequentialCommandGroup(
-      followChoreoCheckpointTrajoectory("Example_auto_1", 0.4, 0.4)
+      followChoreoCheckpointTrajoectory("Example_auto_1", 0.75, 0.3)
         .deadlineFor(new ParallelCommandGroup(intakeAndLoadIndexer(), shooter.shooterDefualtCommand())),
       autoPassOrShoot().withTimeout(3.5),
-      followChoreoCheckpointTrajoectory("Example_auto_p2", 0.4, 0.4)
+      followChoreoCheckpointTrajoectory("Example_auto_p2", 0.75, 0.3)
         .deadlineFor(new ParallelCommandGroup(intakeAndLoadIndexer(), shooter.shooterDefualtCommand())),
       autoPassOrShoot()
     );
