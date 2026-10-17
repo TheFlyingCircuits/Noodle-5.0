@@ -57,16 +57,17 @@ public class Intake extends SubsystemBase {
     }
 
     public void intakeDownThenIntake() {
-        if(inputs.intakePositionDegrees > 15.0) {
+        if(inputs.intakePositionDegrees > 7.5) {
             isIntakeDown = false;
             io.setTargetIntakePositionDegrees(0);
             // reverseIntake();
         } else {
             isIntakeDown = true;
-            if(inputs.intakePositionDegrees < 15.0) {
-                intakeRunRollers();
-            }
             intakeDefault();
+        }
+
+        if(inputs.intakePositionDegrees < 20.0) {
+            intakeRunRollers();
         }
     }
 
