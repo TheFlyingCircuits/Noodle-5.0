@@ -278,7 +278,7 @@ public class RobotContainer {
     final boolean isRedAlliance = DriverStation.getAlliance().get() == Alliance.Red;
 
     boolean shouldMirror = isOnRightSideField();
-    Trajectory<SwerveSample> trajectory = shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
+    Trajectory<SwerveSample> trajectory = !shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
     
     // restarts path timer to 0 for path following
     // runs path until it reaches within position and tolerance of end of path

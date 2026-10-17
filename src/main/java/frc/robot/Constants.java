@@ -227,7 +227,7 @@ public final class Constants {
 
         // amp limits
         public static final double statorCurrentLimitAmps = 90.0;
-        public static final double pivotCurrentLimitAmps = 80.0;
+        public static final double pivotCurrentLimitAmps = 65.0;
 
         // Shooter wheel velocity PID + feedforward tuning
         public static final double shooterVelocityKp = 25.0; //this was old and other is bang bang
@@ -310,7 +310,7 @@ public final class Constants {
         public static final int pivotNeoID = 5;
         public static final int rollerTopKrakenID = 9;
         public static final int rollerBottomKrakenID = 10;
-        public static final double kP = 0.084;
+        public static final double kP = 0.09;
         public static final double kS = 0.7;
 
         public static final double intakeStartDegrees = 112.49; 

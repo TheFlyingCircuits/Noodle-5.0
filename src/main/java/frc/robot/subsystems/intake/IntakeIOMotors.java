@@ -39,7 +39,7 @@ public class IntakeIOMotors implements IntakeIO{
         SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
         pivotConfig.idleMode(IdleMode.kBrake);
-        pivotConfig.smartCurrentLimit(60);
+        pivotConfig.smartCurrentLimit(55);
         pivotConfig.inverted(true);
         pivotConfig.closedLoop.positionWrappingEnabled(true);
 

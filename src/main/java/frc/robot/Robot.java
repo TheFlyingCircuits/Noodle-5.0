@@ -87,6 +87,7 @@ public void simulationPeriod() {
     Command dummyCOmmand = m_robotContainer.ShootCommand();
     CommandScheduler.getInstance().schedule(dummyCOmmand);
     ShooterError shooterError = new ShooterError(9999.0, 9999.0);
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
   }
 
   @Override
@@ -94,8 +95,6 @@ public void simulationPeriod() {
     m_robotContainer.setPoseToAutoStart();
     m_robotContainer.drivetrain.odometry.allowTeleportsNextPoseUpdate();
     m_robotContainer.drivetrain.odometry.fullyTrustVisionNextPoseUpdate();
-
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
   }
 
   @Override
