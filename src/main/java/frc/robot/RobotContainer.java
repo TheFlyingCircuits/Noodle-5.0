@@ -280,12 +280,14 @@ public class RobotContainer {
 
     boolean shouldMirrorLeftRight = isOnRightSideField();
     Trajectory<SwerveSample> trajectory = shouldMirrorLeftRight ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
+
+    double originalTimestamp = Timer.getFPGATimestamp();
     
     // restarts path timer to 0 for path following
     // runs path until it reaches within position and tolerance of end of path
     return new SequentialCommandGroup(
       new InstantCommand(() -> pathTimer.restart()),
-      drivetrain.run(() -> {drivetrain.followCheckpointsTrajectory(trajectory, pathTimer, isRedAlliance, toleranceMeters);})
+      drivetrain.run(() -> {drivetrain.followCheckpointsTrajectory(trajectory, pathTimer, isRedAlliance, toleranceMeters, originalTimestamp);})
         .until(() -> drivetrain.isAtEndOfTrajectory(0.25, 0.15, pathTimer.get(), trajectory.getFinalSample(isRedAlliance).get()))
     );
   }

@@ -36,25 +36,14 @@ public class Shooter extends SubsystemBase {
      * @return A ShooterError record that has the velocity error in RPS and the angle error in degrees.
      */
     public ShooterError setShot(double velocityRPS, double positionDeg) {
-        double before = Timer.getFPGATimestamp();
         io.setShooterVelocity(velocityRPS);
         io.setPivotAngle(positionDeg);
-        double after = Timer.getFPGATimestamp();
-        
-        double ioTime = after - before;
 
         double errorRPS = velocityRPS - inputs.shooterVelocityRPS;
         double errorDeg = positionDeg - inputs.pivotAngleDegrees;
 
-        before = Timer.getFPGATimestamp();
         ShooterError error = new ShooterError(errorRPS, errorDeg);
-        after = Timer.getFPGATimestamp();
 
-        double constructorTime = after-before;
-
-        Logger.recordOutput("TimerTesting/ioTime", ioTime);
-        Logger.recordOutput("TimerTesting/constructorTime", constructorTime);
-        
         return error;
     }
 

@@ -31,10 +31,10 @@ public class Drivetrain extends SubsystemBase {
 
     public Odometry odometry;
 
-    private final PIDController xController = new PIDController(6, 0.1, 0.0);
-    private final PIDController yController = new PIDController(6, 0.1, 0.0);
-    private final PIDController headingController = new PIDController(10.0, 0.0, 0.0);
-    private final PIDController headingControllerAiming = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController xController = new PIDController(8, 0.1, 0.0);
+    private final PIDController yController = new PIDController(8, 0.1, 0.0);
+    private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
+    private final PIDController headingControllerAiming = new PIDController(9.5, 0.0, 0.0);
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -195,7 +195,9 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // checkpoint following 
-    public void followCheckpointsTrajectory(Trajectory<SwerveSample> trajectory, Timer timer, boolean isRedAlliance, double checkpointToleranceMeters) {
+    public void followCheckpointsTrajectory(Trajectory<SwerveSample> trajectory, Timer timer, boolean isRedAlliance, double checkpointToleranceMeters, double originalFGPAStamp) {
+        Logger.recordOutput("FollowCheck path time", timer.get());
+        Logger.recordOutput("FollowCheck real time delta", Timer.getFPGATimestamp() - originalFGPAStamp);
         SwerveSample finalSample= trajectory.getFinalSample(isRedAlliance).get();
         SwerveSample sample = finalSample.t <= timer.get() ? finalSample : trajectory.sampleAt(timer.get(), isRedAlliance).get();
 
@@ -206,6 +208,8 @@ public class Drivetrain extends SubsystemBase {
 
         // initializes the target velocities chassis speeds that we input into field oriented drive
         ChassisSpeeds velocities;
+
+        if(!timer.isRunning()) checkpointToleranceMeters *= 0.3;
 
         // checks if robot error is too much and if so just use pid to get back to last checkpoint/sample pose
         // and also use 50% of feedforward velocity

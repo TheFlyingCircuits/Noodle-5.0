@@ -66,11 +66,11 @@ public class Robot extends LoggedRobot  {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    // m_robotContainer.periodic();
+    m_robotContainer.periodic();
 
-    // if(RobotBase.isSimulation()) {
-    //   simulationPeriod();
-    // }
+    if(RobotBase.isSimulation()) {
+      simulationPeriod();
+    }
   }
 
 public void simulationPeriod() {
@@ -92,7 +92,7 @@ public void simulationPeriod() {
 
   @Override
   public void disabledPeriodic() {
-    m_robotContainer.setPoseToAutoStart(); // <-- THIS READS THE CHOOSER
+    if(Constants.atCompetition) m_robotContainer.setPoseToAutoStart(); // <-- THIS READS THE CHOOSER
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     m_robotContainer.drivetrain.odometry.allowTeleportsNextPoseUpdate();
