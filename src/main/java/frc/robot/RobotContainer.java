@@ -278,9 +278,8 @@ public class RobotContainer {
     // gets alliance value and sees if mirrors path so robot follows correct path
     boolean isRedAlliance = FlyingCircuitUtils.getAllianceDependentValue(true, false, false);
 
-    boolean shouldMirror = isOnRightSideField();
-    if(isRedAlliance) shouldMirror = !shouldMirror;
-    Trajectory<SwerveSample> trajectory = !shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
+    boolean shouldMirrorLeftRight = isOnRightSideField();
+    Trajectory<SwerveSample> trajectory = shouldMirrorLeftRight ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
     
     // restarts path timer to 0 for path following
     // runs path until it reaches within position and tolerance of end of path
@@ -296,28 +295,25 @@ public class RobotContainer {
    * so the vision can reseed the pose so that this method wont overide it each loop.
    */
   public void setPoseToAutoStart() {
-    if(!autoChooser.getSelected().isEmpty()) {
-      if(!(currentAuto.equals(autoChooser.getSelected()))) {
-      Optional<Trajectory<SwerveSample>> optionalTrajectory = Choreo.loadTrajectory("Example_auto_1");
-      // if(optionalTrajectory.isEmpty()) return;
-
-      // gets alliance value and sees if mirrors path so robot follows correct path
-      boolean isRedAlliance = FlyingCircuitUtils.getAllianceDependentValue(true, false, false);
-
-      boolean shouldMirror = !isOnRightSideField();
-      Trajectory<SwerveSample> trajectory = shouldMirror ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
-      Pose2d targetPose = trajectory.sampleAt(0, isRedAlliance).get().getPose();
-
-      drivetrain.odometry.setPoseMeters(targetPose);
-      if(RobotBase.isSimulation()) {
-        swerveDriveSimulation.setSimulationWorldPose(targetPose);;
-      }
-
-      Pose2d currentPose = drivetrain.odometry.getPoseMeters();
-      if(targetPose.equals(currentPose)){
-        currentAuto = autoChooser.getSelected();
-      }
+    if(autoChooser.getSelected().isEmpty()) {
+      SmartDashboard.putBoolean("auto has been received", false);
+      return;
     }
+    SmartDashboard.putBoolean("auto has been received", true);
+    Optional<Trajectory<SwerveSample>> optionalTrajectory = Choreo.loadTrajectory("Example_auto_1");
+    // if(optionalTrajectory.isEmpty()) return;
+
+    // gets alliance value and sees if mirrors path so robot follows correct path
+    boolean isRedAlliance = FlyingCircuitUtils.getAllianceDependentValue(true, false, false);
+
+
+    boolean shouldMirrorLeftRight = autoChooser.getSelected().equals("Right");
+    Trajectory<SwerveSample> trajectory = shouldMirrorLeftRight ? optionalTrajectory.get().mirrorY(): optionalTrajectory.get();
+    Pose2d targetPose = trajectory.sampleAt(0, isRedAlliance).get().getPose();
+
+    drivetrain.odometry.setPoseMeters(targetPose);
+    if(RobotBase.isSimulation()) {
+      swerveDriveSimulation.setSimulationWorldPose(targetPose);;
     }
   }
 
