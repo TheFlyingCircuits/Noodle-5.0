@@ -14,12 +14,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.DrivetrainConstants;
-import frc.robot.Constants.VisionConstants;
 import frc.robot.FlyingCircuitUtils;
 import frc.robot.PlayingField.FieldElement;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -44,7 +42,6 @@ public class Odometry {
 
     
     public SwerveDrivePoseEstimator fusedPoseEstimator;
-    public SwerveDrivePoseEstimator wheelsOnlyPoseEstimator;
 
     public Odometry(Drivetrain drivetrain, GyroIO gyroIO) {
         Logger.recordOutput("Odometry/hasSeenGoodTag", hasSeenGoodTag);
@@ -78,19 +75,12 @@ public class Odometry {
             stateStdDevs,
             visionStdDevs
         );
-
-        wheelsOnlyPoseEstimator = new SwerveDrivePoseEstimator(
-            DrivetrainConstants.swerveKinematics,
-            gyroInputs.robotYawRotation2d,
-            drivetrain.getModulePositions(), 
-            new Pose2d());
     }
 
     //**************** ODOMETRY ****************//
 
     public void setPoseMeters(Pose2d pose) {
         fusedPoseEstimator.resetPosition(gyroInputs.robotYawRotation2d, drivetrain.getModulePositions(), pose);
-        wheelsOnlyPoseEstimator.resetPosition(gyroInputs.robotYawRotation2d, drivetrain.getModulePositions(), pose);
     }
     public void setOrientation(Rotation2d orientation) {
         // keep location the same
@@ -171,7 +161,6 @@ public class Odometry {
 
         // update with wheel deltas
         fusedPoseEstimator.update(gyroInputs.robotYawRotation2d, drivetrain.getModulePositions());
-        wheelsOnlyPoseEstimator.update(gyroInputs.robotYawRotation2d, drivetrain.getModulePositions());
 
         // get all pose observations from each camera
         List<SingleTagPoseObservation> allFreshPoseObservations = new ArrayList<>();
