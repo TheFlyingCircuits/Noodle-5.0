@@ -22,9 +22,9 @@ public class SwerveModuleIOKraken implements SwerveModuleIO {
     private Orchestra orchestra;
 
     final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0).withEnableFOC(true)
-        .withUpdateFreqHz(60.0);
+        .withUpdateFreqHz(1000.0);
     final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(1).withEnableFOC(true)
-        .withUpdateFreqHz(60.0);
+        .withUpdateFreqHz(1000.0);
 
     private CANcoder absoluteEncoder;
     private Kraken angleMotor;
@@ -76,8 +76,9 @@ public class SwerveModuleIOKraken implements SwerveModuleIO {
         cancoderConfigs.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         absoluteEncoder.getConfigurator().apply(cancoderConfigs);
+        absoluteEncoder.getAbsolutePosition().setUpdateFrequency(1000);
     }
-
+    
     private void configDriveMotor(InvertedValue invertedValue) {
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = invertedValue;
@@ -94,6 +95,8 @@ public class SwerveModuleIOKraken implements SwerveModuleIO {
         config.Feedback.SensorToMechanismRatio = 1.0/SwerveModuleConstants.driveGearReduction;  //stage 2 is 6.03:1, stage 1 is 5.27:1, 
         config.ClosedLoopGeneral.ContinuousWrap = true;
         driveMotor.applyConfig(config);
+        driveMotor.getPosition().setUpdateFrequency(1000);
+        driveMotor.getVelocity().setUpdateFrequency(1000);
     }
 
     private void configAngleMotor(InvertedValue invertedValue, int cancoderID) {

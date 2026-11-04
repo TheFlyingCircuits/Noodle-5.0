@@ -1,6 +1,8 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.simulation.VisionTargetSim;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.PlayingField.FieldConstants;
 import frc.robot.subsystems.drivetrain.drivetrain_util.Odometry;
+import frc.robot.subsystems.drivetrain.drivetrain_util.PhoenixOdometryThread;
 import frc.robot.subsystems.drivetrain.gyro.GyroIO;
 import frc.robot.subsystems.drivetrain.swerve.SwerveModule;
 import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIO;
@@ -35,6 +38,9 @@ public class Drivetrain extends SubsystemBase {
     private final PIDController yController = new PIDController(8, 0.1, 0.0);
     private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
     private final PIDController headingControllerAiming = new PIDController(9.5, 0.0, 0.0);
+
+    public static final Lock odometryLock = new ReentrantLock();
+    public static final double ODOMETRY_FREQUENCY = 250.0;
 
     public Drivetrain(
         GyroIO gyroIO, 
@@ -52,6 +58,8 @@ public class Drivetrain extends SubsystemBase {
             new SwerveModule(blSwerveModuleIO, 2, "backLeft"),
             new SwerveModule(brSwerveModuleIO, 3, "backRight")
         };
+        PhoenixOdometryThread.getInstance().start();
+        System.out.println("thread started?");
 
         this.odometry = new Odometry(this, gyroIO);
          Logger.recordOutput("choreo target pose", new Pose2d(0, 0, new Rotation2d()));
@@ -270,10 +278,12 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
+        odometryLock.lock();
         for (SwerveModule mod : swerveModules)
             mod.periodic();
         
         odometry.gyroIO.updateInputs(odometry.gyroInputs);
+        odometryLock.unlock();
 
         Logger.processInputs("gyroInputs", odometry.gyroInputs);
 
@@ -281,7 +291,6 @@ public class Drivetrain extends SubsystemBase {
         
 
         Logger.recordOutput("drivetrain/fusedPose", odometry.fusedPoseEstimator.getEstimatedPosition());
-        Logger.recordOutput("drivetrain/wheelsOnlyPose", odometry.wheelsOnlyPoseEstimator.getEstimatedPosition());
         Logger.recordOutput("drivetrain/speedMetersPerSecond", getSpeedMetersPerSecond());
 
         Logger.recordOutput("drivetrain/swerveModuleStates", getModuleStates());
@@ -293,8 +302,6 @@ public class Drivetrain extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         // Move the simulation forward by 1 timestep (just camera stuff for now)
-        FieldConstants.simulatedTagLayout.update(odometry.wheelsOnlyPoseEstimator.getEstimatedPosition());
-        FieldConstants.simulatedFuelLayout.update(odometry.wheelsOnlyPoseEstimator.getEstimatedPosition());
 
         ArrayList<Translation3d> simulatedFuel = new ArrayList<>();
         for (VisionTargetSim fuel : FieldConstants.simulatedFuelLayout.getVisionTargets()) {
