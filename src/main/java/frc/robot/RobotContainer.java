@@ -72,7 +72,7 @@ public class RobotContainer {
     public Indexer indexer;
     public Shooter shooter;
     public Intake intake;
-    public LedsCANdle candle;
+    // public LedsCANdle candle;
 
     Timer pathTimer;
     Optional<Trajectory<SwerveSample>> trajectory2 = Choreo.loadTrajectory("Example_auto_p2");
@@ -96,6 +96,9 @@ public class RobotContainer {
         indexer = new Indexer(new IndexerIONeo());
         shooter = new Shooter(new ShooterIOKraken());
         intake = new Intake(new IntakeIOMotors());
+        // indexer = new Indexer(new IndexerIOSim());
+        // shooter = new Shooter(new ShooterIOSim());
+        // intake = new Intake(new IntakeIOSim(drivetrain));
 
     } else {
 
@@ -153,7 +156,7 @@ public class RobotContainer {
 
     pathTimer = new Timer();
 
-    candle = new LedsCANdle(45, 8);
+    // candle = new LedsCANdle(45, 8);
 
     System.out.println("Loading ShootTestCommand class: " + ShootTestCommand.class.getName());
     System.out.println("Loading Shooting class: " + ShootIntoHubCommand.class.getName());
@@ -204,8 +207,8 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(driverFullyControlDrivetrain().withName("driveDefualtCommand"));
       shooter.setDefaultCommand(shooter.shooterDefualtCommand());
       indexer.setDefaultCommand(indexer.setIndexerVoltsCommand(0.0));
-      intake.setDefaultCommand(intake.intakeDownCommand());
-      candle.setDefaultCommand(candle.heartbeatCommand().ignoringDisable(true));
+      intake.setDefaultCommand(intake.intakeDefualtAndIntakeCommand());
+      // candle.setDefaultCommand(candle.heartbeatCommand().ignoringDisable(true));
   }
 
   private Command driverFullyControlDrivetrain() { return drivetrain.run(() -> {

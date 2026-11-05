@@ -76,7 +76,7 @@ public class Intake extends SubsystemBase {
 
     public void intakeDefualtAndIntake() {
         io.setIntakeVolts(0);
-        intakeRunRollers();
+        intakeRollersStop();
     }
 
     public void intakeUp() {
