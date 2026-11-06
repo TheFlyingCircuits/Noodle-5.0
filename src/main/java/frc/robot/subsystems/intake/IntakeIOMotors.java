@@ -22,9 +22,9 @@ public class IntakeIOMotors implements IntakeIO{
     private Kraken rollerBottomKraken;
 
     final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0).withEnableFOC(true)
-        .withUpdateFreqHz(60.0);
+        .withUpdateFreqHz(50.0);
     final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(true)
-        .withUpdateFreqHz(60.0);
+        .withUpdateFreqHz(50.0);
 
     public IntakeIOMotors() {
        pivotNeo = new Neo(IntakeConstants.pivotNeoID);

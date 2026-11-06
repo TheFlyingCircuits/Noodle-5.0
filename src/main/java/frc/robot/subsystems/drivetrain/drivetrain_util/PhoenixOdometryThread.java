@@ -109,7 +109,7 @@ public class PhoenixOdometryThread extends Thread {
   @Override
   public void run() {
     while (true) {
-      System.out.println("running odometry thread");
+      // System.out.println("running odometry thread");
       // Wait for updates from all signals
       signalsLock.lock();
       try {

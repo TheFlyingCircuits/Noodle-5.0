@@ -7,9 +7,6 @@ package frc.robot.subsystems.drivetrain.gyro;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import frc.robot.Constants.DrivetrainConstants;
 
 /** Add your docs here. */
 public class GyroIOMapleSim implements GyroIO {

@@ -38,7 +38,7 @@ public class GyroIOPigeon implements GyroIO {
 
         
         pigeon.getConfigurator().apply(configs);
-        pigeon.getYaw().setUpdateFrequency(1000);
+        pigeon.getYaw().setUpdateFrequency(250);
     }
 
     @Override
