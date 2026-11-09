@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -30,7 +31,7 @@ import frc.robot.subsystems.drivetrain.swerve.SwerveModuleIO;
 
 public class Drivetrain extends SubsystemBase {
 
-    private SwerveModule[] swerveModules;
+    public SwerveModule[] swerveModules;
 
     public Odometry odometry;
 
@@ -286,6 +287,7 @@ public class Drivetrain extends SubsystemBase {
         odometryLock.unlock();
 
         Logger.processInputs("gyroInputs", odometry.gyroInputs);
+
 
         odometry.updatePoseEstimator();
         

@@ -1,6 +1,10 @@
 package frc.robot.subsystems.drivetrain.swerve;
 
+import java.util.Queue;
+
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -11,10 +15,14 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.Constants.UniversalConstants;
 import frc.robot.VendorWrappers.Kraken;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.drivetrain_util.PhoenixOdometryThread;
 
 public class SwerveModuleIOKraken implements SwerveModuleIO {
 
@@ -26,9 +34,17 @@ public class SwerveModuleIOKraken implements SwerveModuleIO {
     final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(1).withEnableFOC(true)
         .withUpdateFreqHz(50.0);
 
+    private final StatusSignal<Angle> drivePosition;
+    private final StatusSignal<Angle> turnPosition;
+
     private CANcoder absoluteEncoder;
     private Kraken angleMotor;
     private Kraken driveMotor;
+
+    // Timestamp inputs from Phoenix thread
+    private final Queue<Double> timestampQueue;
+    private final Queue<Double> drivePositionQueue;
+    private final Queue<Double> turnPositionQueue;
 
 
     public SwerveModuleIOKraken(int driveMotorID, int angleMotorID, double angleOffsetRotations, int cancoderID, String name, boolean isInverted) {
@@ -67,6 +83,18 @@ public class SwerveModuleIOKraken implements SwerveModuleIO {
         orchestra = new Orchestra();
         orchestra.addInstrument(driveMotor);
         orchestra.addInstrument(angleMotor);
+
+        drivePosition = driveMotor.getPosition();
+        turnPosition = angleMotor.getPosition();
+
+        // Create timestamp queue
+        timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
+        drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(drivePosition.clone());
+        turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turnPosition.clone());
+
+            // Configure periodic frames
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            Drivetrain.ODOMETRY_FREQUENCY, drivePosition, turnPosition);
     }
 
     private void configCANCoder(double angleOffsetRotations) {
@@ -128,6 +156,21 @@ public class SwerveModuleIOKraken implements SwerveModuleIO {
 
         inputs.driveAppliedVoltage = driveMotor.getMotorVoltage().getValueAsDouble();
         inputs.driveCurrent = driveMotor.getStatorCurrent().getValueAsDouble();
+
+        // Update odometry inputs
+        inputs.odometryTimestamps =
+            timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+        inputs.odometryDrivePositionsRad =
+            drivePositionQueue.stream()
+                .mapToDouble((Double value) -> Units.rotationsToRadians(value))
+                .toArray();
+        inputs.odometryTurnPositions =
+            turnPositionQueue.stream()
+                .map((Double value) -> Rotation2d.fromRotations(value))
+                .toArray(Rotation2d[]::new);
+        timestampQueue.clear();
+        drivePositionQueue.clear();
+        turnPositionQueue.clear();
     }
 
     @Override

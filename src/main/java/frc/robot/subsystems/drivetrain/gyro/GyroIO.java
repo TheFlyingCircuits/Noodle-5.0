@@ -29,6 +29,9 @@ public interface GyroIO {
 
         public Rotation2d robotPitchRotation2d = new Rotation2d(0.0);
         public Rotation2d robotRollRotation2d = new Rotation2d(0.0);
+
+        public double[] odometryYawTimestamps = new double[] {};
+        public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
     }
     
     public default void updateInputs(GyroIOInputs inputs) {};

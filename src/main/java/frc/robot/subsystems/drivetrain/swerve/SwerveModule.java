@@ -7,12 +7,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 // import frc.robot.subsystems.drivetrain.SwerveModuleIOInputsAutoLogged;
+import frc.robot.Constants.SwerveModuleConstants;
 
 public class SwerveModule {
     public int moduleIndex;
 
     private SwerveModuleIO io;
     private SwerveModuleIOInputsAutoLogged inputs;
+
+    private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
     
     private String name;
 
@@ -26,8 +29,17 @@ public class SwerveModule {
 
     public void periodic() {
         io.updateInputs(inputs);
-
         Logger.processInputs("swerveModuleInputs/"+name, inputs);
+
+         // Calculate positions for odometry
+        int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
+        odometryPositions = new SwerveModulePosition[sampleCount];
+
+        for (int i = 0; i < sampleCount; i++) {
+            double positionMeters = inputs.odometryDrivePositionsRad[i] * SwerveModuleConstants.wheelRadiusMeters;
+            Rotation2d angle = inputs.odometryTurnPositions[i];
+            odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
+        }
     }
 
     public void playMusic(String song) {
@@ -85,6 +97,15 @@ public class SwerveModule {
             Rotation2d.fromDegrees(inputs.angleAbsolutePositionDegrees)
         );
         
+    }
+
+
+    public SwerveModulePosition[] getOdometryPositions() {
+        return odometryPositions;
+    }
+
+    public double[] getOdometryTimestamps() {
+        return inputs.odometryTimestamps;
     }
 
 }

@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -32,12 +33,14 @@ public class Odometry {
 
     public GyroIO gyroIO;
     public GyroIOInputsAutoLogged gyroInputs;
+    Rotation2d rawGyroRotation = Rotation2d.kZero;
     Limelights limelights;
 
     private boolean fullyTrustVisionNextPoseUpdate = false;
     private boolean allowTeleportsNextPoseUpdate = false;
     private boolean hasAcceptablePoseObservationsThisLoop = false;
     private boolean hasSeenGoodTag = false;
+    private boolean setFacingForwardThisLoop = false;
     private Optional<FieldElement> focus = Optional.empty();
 
     
@@ -61,7 +64,7 @@ public class Odometry {
         // TODO: could use this experiment as a way to measure these, or we could just
         //       assume their values are fairly representative of what we'd get:
         //       https://docs.advantagekit.org/theory/high-frequency-odometry
-        Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.005);
+        Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.01);
 
         //corresponds to x, y, and rotation standard deviations (meters and radians)
         //these values are automatically recalculated periodically depending on distance
@@ -127,11 +130,16 @@ public class Odometry {
      * Sets the angle of the robot's pose so that it is facing forward, away from your alliance wall. 
      * This allows the driver to realign the drive direction and other calls to our angle.
      */
-    public void setRobotFacingForward() {
+    private void setRobotFacingForwardLocal() {
         Rotation2d forwardOnRed = Rotation2d.k180deg;
         Rotation2d forwardOnBlue = Rotation2d.kZero;
         Rotation2d forwardNow = getPoseMeters().getRotation();
+        gyroIO.setRobotYaw(FlyingCircuitUtils.getAllianceDependentValue(forwardOnRed, forwardOnBlue, forwardNow).getDegrees());
         this.setOrientation(FlyingCircuitUtils.getAllianceDependentValue(forwardOnRed, forwardOnBlue, forwardNow));
+    }
+
+    public void setRobotFacingForward() {
+      setFacingForwardThisLoop = true;
     }
 
     /** Makes the pose estimator only use tags that are on the given field element. */
@@ -159,8 +167,36 @@ public class Odometry {
         Logger.recordOutput("drivetrain/fullyTrustingVision", this.fullyTrustVisionNextPoseUpdate);
         Logger.recordOutput("drivetrain/allowingPoseTeleports", this.allowTeleportsNextPoseUpdate);
 
+        // used for if we should set robot facing forward this loop
+        if(setFacingForwardThisLoop) {
+            rawGyroRotation = FlyingCircuitUtils.getAllianceDependentValue(Rotation2d.k180deg, Rotation2d.kZero, Rotation2d.kZero);
+        }
+
         // update with wheel deltas
-        fusedPoseEstimator.update(gyroInputs.robotYawRotation2d, drivetrain.getModulePositions());
+        // fusedPoseEstimator.update(gyroInputs.robotYawRotation2d, drivetrain.getModulePositions());
+        // Update wheel odometry
+        double[] sampleTimestamps = drivetrain.swerveModules[0].getOdometryTimestamps(); // All signals are sampled together
+        int sampleCount = sampleTimestamps.length;
+        Logger.recordOutput("drivetrain/sampleCount", sampleCount);
+
+        for (int i = 0; i < sampleCount; i++) {
+            // Read wheel positions and deltas from each module
+            SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+
+            for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+                modulePositions[moduleIndex] = drivetrain.swerveModules[moduleIndex].getOdometryPositions()[i];
+            }
+
+            
+            if(!setFacingForwardThisLoop) rawGyroRotation = gyroInputs.odometryYawPositions[i];
+
+            // Apply update
+            fusedPoseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+        }
+
+        if(setFacingForwardThisLoop) setRobotFacingForwardLocal();
+
+        setFacingForwardThisLoop = false;
 
         // get all pose observations from each camera
         List<SingleTagPoseObservation> allFreshPoseObservations = new ArrayList<>();

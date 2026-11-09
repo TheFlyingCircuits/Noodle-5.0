@@ -2,6 +2,8 @@ package frc.robot.subsystems.drivetrain.swerve;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
 public interface SwerveModuleIO {
     
     @AutoLog
@@ -14,6 +16,10 @@ public interface SwerveModuleIO {
 
         public double driveAppliedVoltage = 0.0;
         public double driveCurrent = 0.0;
+
+        public double[] odometryTimestamps = new double[] {};
+        public double[] odometryDrivePositionsRad = new double[] {};
+        public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
     }
     
     public default void updateInputs(SwerveModuleIOInputs inputs) {};
