@@ -19,13 +19,13 @@ double ambiguity, boolean usingMultiTag, int closestTagID, double yawRateRad) {
 
     public Matrix<N3, N1> getStandardDeviations(boolean isScoringInHub) {
 
-        if(usingMultiTag) {
-            return VecBuilder.fill(
-                0.1 + yawRateRad * 1.0,
-                0.1 + yawRateRad * 1.0,
-                0.2 + yawRateRad * 1.0
-            );
-        }
+        // if(usingMultiTag) {
+        //     return VecBuilder.fill(
+        //         0.1 + yawRateRad * 1.0,
+        //         0.1 + yawRateRad * 1.0,
+        //         0.2 + yawRateRad * 1.0
+        //     );
+        // }
         // double slopeStdDevMeters_PerMeter = 0.0023;
         double xyStdDev = (0.1 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 1.0;
 

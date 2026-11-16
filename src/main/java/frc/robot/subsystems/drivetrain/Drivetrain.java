@@ -9,16 +9,17 @@ import org.photonvision.simulation.VisionTargetSim;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
@@ -37,6 +38,11 @@ public class Drivetrain extends SubsystemBase {
 
     private final PIDController xController = new PIDController(8, 0.1, 0.0);
     private final PIDController yController = new PIDController(8, 0.1, 0.0);
+
+    private final PIDController xControllerToPose = new PIDController(4.0, 0.0, 0.0);
+    private final PIDController yControllerToPose = new PIDController(4.0, 0.0, 0.0);
+    
+
     private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
     private final PIDController headingControllerAiming = new PIDController(9.5, 0.0, 0.0);
 
@@ -52,6 +58,11 @@ public class Drivetrain extends SubsystemBase {
     ) {
 
         headingController.enableContinuousInput(-Math.PI, Math.PI);
+        headingControllerAiming.enableContinuousInput(-Math.PI, Math.PI);
+
+        xControllerToPose.setTolerance(0.02);
+        yControllerToPose.setTolerance(0.02);
+        headingControllerAiming.setTolerance(Units.degreesToRadians(0.5));
 
         swerveModules = new SwerveModule[] {
             new SwerveModule(flSwerveModuleIO, 0, "frontLeft"),
@@ -148,6 +159,57 @@ public class Drivetrain extends SubsystemBase {
         SwerveModuleState state2 = new SwerveModuleState(0.0, Rotation2d.fromDegrees(45));
         SwerveModuleState[] states = {state2,state,state,state2};
         setModuleStates(states);
+    }
+
+    public void pidToPose(Pose2d desired, double maxSpeedMetersPerSecond) {
+        Logger.recordOutput("drivetrain/pidSetpointMeters", desired);
+        // translationController.setP(pValue);
+
+        Pose2d current = odometry.getPoseMeters();
+
+        Translation2d error = desired.getTranslation().minus(current.getTranslation());
+
+        Logger.recordOutput("drivetrain/pidErrorMeters", error);
+        
+        // double pidOutputMetersPerSecond = -translationController.calculate(error.getNorm(), 0);
+
+        // pidOutputMetersPerSecond = MathUtil.clamp(pidOutputMetersPerSecond, -maxSpeedMetersPerSecond, maxSpeedMetersPerSecond);
+        double xMetersPerSecond = xControllerToPose.calculate(current.getX(), desired.getX());
+        double yMetersPerSecond = yControllerToPose.calculate(current.getY(), desired.getY());
+
+        if (xControllerToPose.atSetpoint()) {
+            xMetersPerSecond = 0;
+        }
+
+        if (yControllerToPose.atSetpoint()) {
+            yMetersPerSecond = 0;
+        }
+        
+        fieldOrientedDriveWhileAiming(
+            new ChassisSpeeds(
+                xMetersPerSecond,
+                yMetersPerSecond,
+                0
+            ),
+            desired.getRotation()
+        );
+    }
+
+    public void fieldOrientedDriveWhileAiming(ChassisSpeeds desiredTranslationalSpeeds, Rotation2d desiredAngle) {
+        // Use PID controller to generate a desired angular velocity based on the desired angle
+        Rotation2d measuredAngle = odometry.getPoseMeters().getRotation();
+        double desiredRadPerSec = headingControllerAiming.calculate(measuredAngle.minus(desiredAngle).getRadians());
+        if (headingControllerAiming.atSetpoint()) {
+            desiredRadPerSec = 0;
+        }
+
+        ChassisSpeeds desiredSpeeds = new ChassisSpeeds(
+            desiredTranslationalSpeeds.vxMetersPerSecond,
+            desiredTranslationalSpeeds.vyMetersPerSecond,
+            desiredRadPerSec
+        );
+
+        this.fieldOrientedDrive(desiredSpeeds);
     }
 
     /**

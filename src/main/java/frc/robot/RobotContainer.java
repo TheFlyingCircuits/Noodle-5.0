@@ -23,6 +23,8 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -186,7 +188,10 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    duncanController.rightBumper().whileTrue(autoPassOrShoot());
+    duncanController.rightBumper().whileTrue(drivetrain.run(() -> 
+      drivetrain.pidToPose(new Pose2d(new Translation2d(13.63025, 7.30892), Rotation2d.kZero), 
+      4.0)));
+    // duncanController.rightBumper().whileTrue(autoPassOrShoot());
 
     duncanController.leftTrigger().whileTrue(intakeAndLoadIndexer());
     duncanController.rightTrigger().whileTrue(intake.reverseIntakeCommand().alongWith(indexer.setIndexerVelocityCommand(-20.0)));
