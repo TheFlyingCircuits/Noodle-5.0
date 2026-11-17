@@ -27,9 +27,9 @@ double ambiguity, boolean usingMultiTag, int closestTagID, double yawRateRad) {
         //     );
         // }
         // double slopeStdDevMeters_PerMeter = 0.0023;
-        double xyStdDev = (0.1 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 1.0;
+        double xyStdDev = (0.1 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 2.0;
 
-        double rotStdDev = (0.07 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 1.0;
+        double rotStdDev = (0.07 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 2.0;
 
         return VecBuilder.fill(
             xyStdDev,

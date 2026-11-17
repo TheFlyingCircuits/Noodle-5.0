@@ -9,7 +9,6 @@ import org.photonvision.simulation.VisionTargetSim;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -39,12 +38,16 @@ public class Drivetrain extends SubsystemBase {
     private final PIDController xController = new PIDController(8, 0.1, 0.0);
     private final PIDController yController = new PIDController(8, 0.1, 0.0);
 
-    private final PIDController xControllerToPose = new PIDController(4.0, 0.0, 0.0);
-    private final PIDController yControllerToPose = new PIDController(4.0, 0.0, 0.0);
-    
+    private final PIDController xControllerToPose = new PIDController(3.1, 0.0, 0.02);
+    private final PIDController yControllerToPose = new PIDController(3.1, 0.0, 0.02);
+    // private final PIDController xControllerToPose = new PIDController(0.0, 0.0, 0.0);
+    // private final PIDController yControllerToPose = new PIDController(0.0, 0.0, 0.0);
+    private final PIDController headingControllerAiming = new PIDController(3.8, 0.0, 0.02);
+
+    double xyToleranceM = 0.02;
+    double anlgeToleranceDeg = 0.9;
 
     private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
-    private final PIDController headingControllerAiming = new PIDController(9.5, 0.0, 0.0);
 
     public static final Lock odometryLock = new ReentrantLock();
     public static final double ODOMETRY_FREQUENCY = 250.0;
@@ -60,9 +63,9 @@ public class Drivetrain extends SubsystemBase {
         headingController.enableContinuousInput(-Math.PI, Math.PI);
         headingControllerAiming.enableContinuousInput(-Math.PI, Math.PI);
 
-        xControllerToPose.setTolerance(0.02);
+        xControllerToPose.setTolerance(0.2);
         yControllerToPose.setTolerance(0.02);
-        headingControllerAiming.setTolerance(Units.degreesToRadians(0.5));
+        headingControllerAiming.setTolerance(Units.degreesToRadians(0.9));
 
         swerveModules = new SwerveModule[] {
             new SwerveModule(flSwerveModuleIO, 0, "frontLeft"),
@@ -174,14 +177,21 @@ public class Drivetrain extends SubsystemBase {
         // double pidOutputMetersPerSecond = -translationController.calculate(error.getNorm(), 0);
 
         // pidOutputMetersPerSecond = MathUtil.clamp(pidOutputMetersPerSecond, -maxSpeedMetersPerSecond, maxSpeedMetersPerSecond);
-        double xMetersPerSecond = xControllerToPose.calculate(current.getX(), desired.getX());
-        double yMetersPerSecond = yControllerToPose.calculate(current.getY(), desired.getY());
+        double xErrorM = current.getX() - desired.getX();
+        double yErrorM =  current.getY() - desired.getY();
+        double xMetersPerSecond = xControllerToPose.calculate(xErrorM);
+        double yMetersPerSecond = yControllerToPose.calculate(yErrorM);
+        Logger.recordOutput("drivetrain/xError", xErrorM);
+        Logger.recordOutput("drivetrain/yError", yErrorM);
+        if (xyToleranceM >= Math.abs(xErrorM)) {
+            Logger.recordOutput("drivetrain/pidSetpointXReached", true);
 
-        if (xControllerToPose.atSetpoint()) {
             xMetersPerSecond = 0;
+        } else {
+            Logger.recordOutput("drivetrain/pidSetpointXReached", false);
         }
 
-        if (yControllerToPose.atSetpoint()) {
+        if (xyToleranceM >= Math.abs(yErrorM)) {
             yMetersPerSecond = 0;
         }
         
@@ -198,8 +208,9 @@ public class Drivetrain extends SubsystemBase {
     public void fieldOrientedDriveWhileAiming(ChassisSpeeds desiredTranslationalSpeeds, Rotation2d desiredAngle) {
         // Use PID controller to generate a desired angular velocity based on the desired angle
         Rotation2d measuredAngle = odometry.getPoseMeters().getRotation();
-        double desiredRadPerSec = headingControllerAiming.calculate(measuredAngle.minus(desiredAngle).getRadians());
-        if (headingControllerAiming.atSetpoint()) {
+        double errorRad = measuredAngle.minus(desiredAngle).getRadians();
+        double desiredRadPerSec = headingControllerAiming.calculate(errorRad);
+        if (xyToleranceM >= Math.abs(errorRad)) {
             desiredRadPerSec = 0;
         }
 
