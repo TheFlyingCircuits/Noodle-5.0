@@ -140,6 +140,7 @@ public class Odometry {
 
     public void setRobotFacingForward() {
       setFacingForwardThisLoop = true;
+      gyroIO.setRobotYaw(0.0);
     }
 
     /** Makes the pose estimator only use tags that are on the given field element. */

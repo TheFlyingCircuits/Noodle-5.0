@@ -56,6 +56,8 @@ public class GyroIOPigeon implements GyroIO {
         configs.MountPose.MountPoseYaw =  GyroConstants.mountPoseYawDegrees;
         configs.MountPose.MountPosePitch = GyroConstants.mountPosePitchDegrees;
         configs.MountPose.MountPoseRoll = GyroConstants.mountPoseRollDegrees;
+        // add 0.83 deg per rotation this was the average measured drit in expermient this is a test tho
+        configs.GyroTrim.GyroScalarZ = 1.042428183;
 
         
         pigeon.getConfigurator().apply(configs);
