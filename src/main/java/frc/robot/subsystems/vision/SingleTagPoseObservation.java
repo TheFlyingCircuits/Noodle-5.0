@@ -5,7 +5,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.LimelightHelpers.RawFiducial;
 import frc.robot.PlayingField.FieldConstants;;
 
@@ -27,9 +26,13 @@ double ambiguity, boolean usingMultiTag, int closestTagID, double yawRateRad) {
         //     );
         // }
         // double slopeStdDevMeters_PerMeter = 0.0023;
-        double xyStdDev = (0.1 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 2.0;
+        double xyStdDev = (0.06 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 5.0;
 
-        double rotStdDev = (0.07 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 2.0;
+        double rotStdDev = (0.02 * Math.pow(tagToCamMeters, 2)) + yawRateRad * 5.0;
+
+        // double xyStdDev = 0.0;
+
+        // double rotStdDev = 0.0;
 
         return VecBuilder.fill(
             xyStdDev,

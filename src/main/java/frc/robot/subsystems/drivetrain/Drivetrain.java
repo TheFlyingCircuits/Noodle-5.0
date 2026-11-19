@@ -42,10 +42,10 @@ public class Drivetrain extends SubsystemBase {
     private final PIDController yControllerToPose = new PIDController(3.1, 0.0, 0.02);
     // private final PIDController xControllerToPose = new PIDController(0.0, 0.0, 0.0);
     // private final PIDController yControllerToPose = new PIDController(0.0, 0.0, 0.0);
-    private final PIDController headingControllerAiming = new PIDController(3.8, 0.0, 0.02);
+    private final PIDController headingControllerAiming = new PIDController(3.6, 0.0, 0.02);
 
-    double xyToleranceM = 0.02;
-    double anlgeToleranceDeg = 0.9;
+    double xyToleranceM = 0.03;
+    double anlgeToleranceDeg = 1.0;
 
     private final PIDController headingController = new PIDController(8.0, 0.0, 0.0);
 

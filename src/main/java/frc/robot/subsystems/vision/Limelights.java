@@ -17,12 +17,14 @@ public class Limelights {
         this.camNames=camNames;
         for(String camName : camNames) {
             LimelightHelpers.setPipelineIndex(camName, 0);
-            LimelightHelpers.SetIMUAssistAlpha(camName, 0.06);
+            // was 0.06
+            LimelightHelpers.SetIMUAssistAlpha(camName, 0.2);
         }
     }
 
     public List<SingleTagPoseObservation> getFreshPoseObservations(boolean usingMT2, Drivetrain drivetrain) {
         ArrayList<SingleTagPoseObservation> poseObservations = new ArrayList<SingleTagPoseObservation>();
+        // usingMT2 = false;
 
         for(String camName : camNames) {
             double robotYawRateRad = drivetrain.getRobotRelativeVelocityMPS().omegaRadiansPerSecond;
@@ -62,7 +64,7 @@ public class Limelights {
 
                     SingleTagPoseObservation poseObservation = new SingleTagPoseObservation(
                         camName, new Pose3d(mt1.pose), mt1.timestampSeconds, fiducialsUsed, 
-                            closestTag.distToCamera, closestTag.ambiguity, seesMultibleTags, closestTag.id, Math.abs(robotYawRateRad));
+                            closestTag.distToCamera, closestTag.ambiguity, seesMultibleTags, closestTag.id, 0.0);
 
                     poseObservations.add(poseObservation);
                 }
